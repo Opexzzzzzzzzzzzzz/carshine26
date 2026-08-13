@@ -1,0 +1,92 @@
+import Link from "next/link";
+import { categories } from "@/lib/catalog";
+
+export default function Footer() {
+  return (
+    <footer className="mt-24 border-t border-border bg-bg-2">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <div className="font-display text-xl font-bold">
+            Car<span className="text-gold-gradient">Shine</span>
+          </div>
+          <p className="mt-3 max-w-xs text-sm leading-relaxed text-fg-muted">
+            Детейлинг-маркет автохимии, аксессуаров и оборудования. Для
+            профессионалов и тех, кто любит ухоженный автомобиль.
+          </p>
+          <div className="mt-4 flex gap-2">
+            {["VK", "TG", "WA"].map((s) => (
+              <span
+                key={s}
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-xs text-fg-muted transition-colors hover:border-gold hover:text-gold"
+              >
+                {s}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h4 className="mb-3 text-sm font-semibold uppercase tracking-wider text-fg-dim">
+            Каталог
+          </h4>
+          <ul className="space-y-2 text-sm">
+            {categories.map((c) => (
+              <li key={c.slug}>
+                <Link
+                  href={`/catalog/${c.slug}`}
+                  className="text-fg-muted transition-colors hover:text-gold"
+                >
+                  {c.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          <h4 className="mb-3 text-sm font-semibold uppercase tracking-wider text-fg-dim">
+            Покупателю
+          </h4>
+          <ul className="space-y-2 text-sm text-fg-muted">
+            <li><Link href="/catalog" className="hover:text-gold">Все товары</Link></li>
+            <li><Link href="/admin" className="hover:text-gold">Панель управления</Link></li>
+            <li>Доставка и оплата</li>
+            <li>Возврат</li>
+            <li>Политика конфиденциальности</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 className="mb-3 text-sm font-semibold uppercase tracking-wider text-fg-dim">
+            Контакты
+          </h4>
+          <ul className="space-y-2 text-sm text-fg-muted">
+            <li>
+              <a href="tel:+79180305835" className="hover:text-gold">
+                +7 918 030-58-35
+              </a>
+            </li>
+            <li>
+              <a href="tel:+79288242991" className="hover:text-gold">
+                +7 928 824-29-91
+              </a>
+            </li>
+            <li>
+              <a href="mailto:carshinestavropol@gmail.com" className="hover:text-gold">
+                carshinestavropol@gmail.com
+              </a>
+            </li>
+            <li>Ставрополь, пер. Онежский, 28/3</li>
+          </ul>
+        </div>
+      </div>
+
+      <div className="border-t border-border">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-5 text-xs text-fg-dim sm:flex-row">
+          <span>© {new Date().getFullYear()} CarShine · Детейлинг-маркет</span>
+          <span>Прототип нового сайта · демо-данные</span>
+        </div>
+      </div>
+    </footer>
+  );
+}
