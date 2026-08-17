@@ -1,0 +1,10 @@
+import { chromium } from "playwright";
+import { readFileSync } from "fs";
+const html = readFileSync("deck.html","utf8");
+const b = await chromium.launch();
+const p = await (await b.newContext({viewport:{width:1280,height:720},deviceScaleFactor:1.5})).newPage();
+await p.setContent(html,{waitUntil:"networkidle"});
+const secs = await p.$$("section.slide");
+await secs[2].screenshot({path:"deck/v-cmp.png"});
+await secs[12].screenshot({path:"deck/v-price.png"});
+await b.close(); console.log("ok");

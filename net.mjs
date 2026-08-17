@@ -1,0 +1,12 @@
+import { chromium } from "playwright";
+const b = await chromium.launch();
+const page = await (await b.newContext({ userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36" })).newPage();
+const urls = [];
+page.on("response", r => urls.push(`${r.status()} ${r.request().resourceType()} ${r.url()}`));
+await page.goto("https://carshine26.com/abrazivnye-pasty-dlya-lkp", { waitUntil: "networkidle" });
+await page.waitForTimeout(3000);
+const txtLen = (await page.evaluate(()=>document.body.innerText)).length;
+const frames = page.frames().map(f=>f.url());
+console.log("bodyTextLen:", txtLen, "frames:", frames.length);
+console.log(urls.filter(u=>/api|json|product|store|getproduct|feed/i.test(u)).join("\n"));
+await b.close();
