@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { products, formatPrice } from "@/lib/catalog";
+import { products as allProducts, formatPrice } from "@/lib/shop";
+
+const products = allProducts.slice(0, 80);
 
 const orders = [
   { id: "1043", name: "Алексей М.", sum: 3840, status: "Новый", city: "Ставрополь" },

@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { Manrope, Unbounded } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/lib/cart";
+import { FavoritesProvider } from "@/lib/favorites";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
+import WishlistDrawer from "@/components/WishlistDrawer";
 
 const body = Manrope({
   variable: "--font-body",
@@ -20,7 +22,7 @@ const display = Unbounded({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://carshine26.com"),
+  metadataBase: new URL("https://carshine26.ru"),
   title: {
     default: "CarShine — детейлинг-маркет автохимии в Ставрополе",
     template: "%s · CarShine",
@@ -48,12 +50,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="ru" className={`${body.variable} ${display.variable} h-full`}>
       <body className="min-h-full flex flex-col">
-        <CartProvider>
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-          <CartDrawer />
-        </CartProvider>
+        <FavoritesProvider>
+          <CartProvider>
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+            <CartDrawer />
+            <WishlistDrawer />
+          </CartProvider>
+        </FavoritesProvider>
       </body>
     </html>
   );

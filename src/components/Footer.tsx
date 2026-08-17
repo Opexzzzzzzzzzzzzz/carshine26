@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { categories } from "@/lib/catalog";
+import { groups } from "@/lib/shop";
 
 export default function Footer() {
   return (
@@ -14,13 +14,18 @@ export default function Footer() {
             профессионалов и тех, кто любит ухоженный автомобиль.
           </p>
           <div className="mt-4 flex gap-2">
-            {["VK", "TG", "WA"].map((s) => (
-              <span
+            {[
+              ["VK", "https://vk.com/carshinestavropol"],
+              ["TG", "https://t.me/carshinestavropol"],
+              ["WA", "https://wa.me/79180305835"],
+            ].map(([s, href]) => (
+              <a
                 key={s}
+                href={href}
                 className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-xs text-fg-muted transition-colors hover:border-gold hover:text-gold"
               >
                 {s}
-              </span>
+              </a>
             ))}
           </div>
         </div>
@@ -30,13 +35,13 @@ export default function Footer() {
             Каталог
           </h4>
           <ul className="space-y-2 text-sm">
-            {categories.map((c) => (
-              <li key={c.slug}>
+            {groups.map((g) => (
+              <li key={g.slug}>
                 <Link
-                  href={`/catalog/${c.slug}`}
+                  href={`/catalog/${g.slug}`}
                   className="text-fg-muted transition-colors hover:text-gold"
                 >
-                  {c.title}
+                  {g.title}
                 </Link>
               </li>
             ))}
@@ -49,10 +54,9 @@ export default function Footer() {
           </h4>
           <ul className="space-y-2 text-sm text-fg-muted">
             <li><Link href="/catalog" className="hover:text-gold">Все товары</Link></li>
-            <li><Link href="/admin" className="hover:text-gold">Панель управления</Link></li>
-            <li>Доставка и оплата</li>
-            <li>Возврат</li>
-            <li>Политика конфиденциальности</li>
+            <li><Link href="/about" className="hover:text-gold">О нас</Link></li>
+            <li><Link href="/contacts" className="hover:text-gold">Контакты</Link></li>
+            <li><Link href="/privacy" className="hover:text-gold">Политика конфиденциальности</Link></li>
           </ul>
         </div>
 
@@ -61,21 +65,9 @@ export default function Footer() {
             Контакты
           </h4>
           <ul className="space-y-2 text-sm text-fg-muted">
-            <li>
-              <a href="tel:+79180305835" className="hover:text-gold">
-                +7 918 030-58-35
-              </a>
-            </li>
-            <li>
-              <a href="tel:+79288242991" className="hover:text-gold">
-                +7 928 824-29-91
-              </a>
-            </li>
-            <li>
-              <a href="mailto:carshinestavropol@gmail.com" className="hover:text-gold">
-                carshinestavropol@gmail.com
-              </a>
-            </li>
+            <li><a href="tel:+79180305835" className="hover:text-gold">+7 918 030-58-35</a></li>
+            <li><a href="tel:+79288242991" className="hover:text-gold">+7 928 824-29-91</a></li>
+            <li><a href="mailto:carshinestavropol@gmail.com" className="hover:text-gold">carshinestavropol@gmail.com</a></li>
             <li>Ставрополь, пер. Онежский, 28/3</li>
           </ul>
         </div>
@@ -84,7 +76,7 @@ export default function Footer() {
       <div className="border-t border-border">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-5 text-xs text-fg-dim sm:flex-row">
           <span>© {new Date().getFullYear()} CarShine · Детейлинг-маркет</span>
-          <span>Прототип нового сайта · демо-данные</span>
+          <span>Ставрополь</span>
         </div>
       </div>
     </footer>

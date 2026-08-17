@@ -1,24 +1,25 @@
 import type { Metadata } from "next";
 import CatalogView from "@/components/CatalogView";
-import { products } from "@/lib/catalog";
+import { allProductsLite, totalProducts } from "@/lib/shop";
 
 export const metadata: Metadata = {
-  title: "Каталог — вся автохимия и оборудование",
+  title: "Каталог — вся автохимия и оборудование для детейлинга",
   description:
-    "Полный каталог CarShine: полировка, мойка и уход, оборудование, аксессуары, плёнка и наборы.",
+    "Полный каталог CarShine: полировка, мойка и уход, оборудование, аксессуары, плёнка и наборы. Более 1700 товаров.",
 };
 
 export default function CatalogPage() {
+  const list = allProductsLite();
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
       <nav className="mb-2 text-xs text-fg-dim">Главная / Каталог</nav>
       <h1 className="font-display text-3xl font-bold sm:text-4xl">Каталог</h1>
       <p className="mt-2 max-w-2xl text-fg-muted">
-        Всё для детейлинга в одном месте. Используйте фильтры, чтобы быстро найти
-        нужное.
+        {totalProducts.toLocaleString("ru-RU")} товаров для детейлинга. Используйте
+        фильтры, чтобы быстро найти нужное.
       </p>
       <div className="mt-8">
-        <CatalogView products={products} />
+        <CatalogView products={list} />
       </div>
     </div>
   );

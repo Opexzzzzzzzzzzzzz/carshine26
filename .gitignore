@@ -40,3 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 data/images/
+shots2/
+realshots.mjs
+discover.mjs
+discover2.mjs
+net.mjs
+verify2.mjs

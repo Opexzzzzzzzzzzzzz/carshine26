@@ -3,30 +3,53 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useCart, formatPrice } from "@/lib/cart";
-import { productBySlug } from "@/lib/catalog";
+import { productBySlug } from "@/lib/shop";
 import ProductImage from "@/components/ProductImage";
 
 export default function CheckoutPage() {
   const { lines, total, clear } = useCart();
   const [done, setDone] = useState(false);
-  const [delivery, setDelivery] = useState("courier");
-  const [pay, setPay] = useState("online");
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
+  const [form, setForm] = useState({ name: "", email: "", phone: "", promo: "" });
+  const [agree, setAgree] = useState(false);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    if (!agree) { setError("Подтвердите согласие с политикой конфиденциальности"); return; }
+    setSending(true);
+    try {
+      const items = lines
+        .map((l) => {
+          const p = productBySlug(l.slug);
+          return p ? { title: p.title, qty: l.qty, price: p.price, sum: (p.price ?? 0) * l.qty } : null;
+        })
+        .filter(Boolean);
+      const res = await fetch("/api/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, total, items }),
+      });
+      if (!res.ok) throw new Error("bad response");
+      clear();
+      setDone(true);
+    } catch {
+      setError("Не удалось отправить заказ. Попробуйте ещё раз или свяжитесь с нами в WhatsApp.");
+    } finally {
+      setSending(false);
+    }
+  };
 
   if (done) {
     return (
       <div className="mx-auto max-w-lg px-4 py-24 text-center">
         <div className="text-5xl">✅</div>
-        <h1 className="mt-4 font-display text-2xl font-bold">
-          Заказ оформлен!
-        </h1>
+        <h1 className="mt-4 font-display text-2xl font-bold">Заявка отправлена!</h1>
         <p className="mt-2 text-fg-muted">
-          Это прототип — реальный заказ не отправлен. На боевом сайте здесь
-          подключается оплата и уведомление менеджеру.
+          Мы получили ваш заказ и свяжемся с вами для подтверждения. Спасибо!
         </p>
-        <Link
-          href="/catalog"
-          className="mt-6 inline-block rounded-xl bg-gold px-6 py-3 font-semibold text-black hover:bg-gold-2"
-        >
+        <Link href="/catalog" className="mt-6 inline-block rounded-xl bg-gold px-6 py-3 font-semibold text-black hover:bg-gold-2">
           Вернуться в каталог
         </Link>
       </div>
@@ -38,10 +61,7 @@ export default function CheckoutPage() {
       <div className="mx-auto max-w-lg px-4 py-24 text-center">
         <div className="text-4xl opacity-40">🧺</div>
         <h1 className="mt-4 font-display text-2xl font-bold">Корзина пуста</h1>
-        <Link
-          href="/catalog"
-          className="mt-6 inline-block rounded-xl bg-gold px-6 py-3 font-semibold text-black hover:bg-gold-2"
-        >
+        <Link href="/catalog" className="mt-6 inline-block rounded-xl bg-gold px-6 py-3 font-semibold text-black hover:bg-gold-2">
           Перейти в каталог
         </Link>
       </div>
@@ -51,134 +71,57 @@ export default function CheckoutPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
       <h1 className="font-display text-3xl font-bold">Оформление заказа</h1>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          clear();
-          setDone(true);
-        }}
-        className="mt-8 grid gap-8 lg:grid-cols-[1fr_380px]"
-      >
-        <div className="space-y-6">
-          <Fieldset title="Контактные данные">
-            <Field label="Имя" placeholder="Как к вам обращаться" required />
-            <Field label="Телефон" placeholder="+7 (___) ___-__-__" type="tel" required />
-            <Field label="Email" placeholder="you@example.com" type="email" />
-          </Fieldset>
+      <form onSubmit={submit} className="mt-8 grid gap-8 lg:grid-cols-[1fr_380px]">
+        <div className="surface-card rounded-2xl p-6">
+          <h3 className="mb-4 font-semibold">Ваши данные</h3>
+          <div className="space-y-3">
+            <Field label="Ваше имя" value={form.name} onChange={(v) => setForm({ ...form, name: v })} required placeholder="Как к вам обращаться" />
+            <Field label="Ваш Email" type="email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} placeholder="you@example.com" />
+            <Field label="Номер телефона" type="tel" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} required placeholder="+7 (___) ___-__-__" />
+            <Field label="Промокод" value={form.promo} onChange={(v) => setForm({ ...form, promo: v })} placeholder="если есть" />
+          </div>
 
-          <Fieldset title="Доставка">
-            <div className="grid gap-2 sm:grid-cols-3">
-              {[
-                ["courier", "Курьер", "по Ставрополю"],
-                ["pickup", "Самовывоз", "Онежский, 28/3"],
-                ["russia", "СДЭК / Почта", "по России"],
-              ].map(([v, t, d]) => (
-                <label
-                  key={v}
-                  className={`cursor-pointer rounded-xl border p-3 text-sm transition-colors ${
-                    delivery === v
-                      ? "border-gold bg-gold/10"
-                      : "border-border-strong hover:border-fg-dim"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="delivery"
-                    className="hidden"
-                    checked={delivery === v}
-                    onChange={() => setDelivery(v)}
-                  />
-                  <div className="font-medium">{t}</div>
-                  <div className="text-xs text-fg-dim">{d}</div>
-                </label>
-              ))}
-            </div>
-            {delivery !== "pickup" && (
-              <Field label="Адрес" placeholder="Город, улица, дом, квартира" />
-            )}
-          </Fieldset>
+          <label className="mt-5 flex cursor-pointer items-start gap-2.5 text-sm text-fg-muted">
+            <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[var(--gold)]" />
+            <span>
+              Я согласен с{" "}
+              <Link href="/privacy" className="text-gold hover:underline">политикой конфиденциальности</Link>
+            </span>
+          </label>
 
-          <Fieldset title="Оплата">
-            <div className="grid gap-2 sm:grid-cols-3">
-              {[
-                ["online", "Онлайн-картой", "СБП / карта"],
-                ["receipt", "При получении", "нал / карта"],
-                ["invoice", "Счёт для юрлиц", "по реквизитам"],
-              ].map(([v, t, d]) => (
-                <label
-                  key={v}
-                  className={`cursor-pointer rounded-xl border p-3 text-sm transition-colors ${
-                    pay === v
-                      ? "border-gold bg-gold/10"
-                      : "border-border-strong hover:border-fg-dim"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="pay"
-                    className="hidden"
-                    checked={pay === v}
-                    onChange={() => setPay(v)}
-                  />
-                  <div className="font-medium">{t}</div>
-                  <div className="text-xs text-fg-dim">{d}</div>
-                </label>
-              ))}
-            </div>
-          </Fieldset>
+          {error && <div className="mt-4 rounded-lg bg-danger/10 px-4 py-3 text-sm text-danger">{error}</div>}
         </div>
 
-        {/* Сводка */}
         <aside className="h-max lg:sticky lg:top-28">
           <div className="surface-card rounded-2xl p-5">
             <h3 className="mb-4 font-semibold">Ваш заказ</h3>
-            <div className="scroll-thin max-h-64 space-y-3 overflow-y-auto">
+            <div className="scroll-thin max-h-72 space-y-3 overflow-y-auto">
               {lines.map((l) => {
                 const p = productBySlug(l.slug);
                 if (!p) return null;
                 return (
                   <div key={l.slug} className="flex items-center gap-3">
-                    <ProductImage
-                      product={p}
-                      compact
-                      className="h-12 w-12 shrink-0 rounded-lg"
-                    />
+                    <ProductImage product={p} sizes="48px" className="h-12 w-12 shrink-0 rounded-lg" />
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-xs">{p.title}</div>
-                      <div className="text-xs text-fg-dim">
-                        {l.qty} × {formatPrice(p.price)}
-                      </div>
+                      <div className="line-clamp-2 text-xs">{p.title}</div>
+                      <div className="text-xs text-fg-dim">{l.qty} × {formatPrice(p.price)}</div>
                     </div>
-                    <div className="text-sm font-medium">
-                      {formatPrice(p.price * l.qty)}
-                    </div>
+                    <div className="text-sm font-medium">{p.price ? formatPrice(p.price * l.qty) : "—"}</div>
                   </div>
                 );
               })}
             </div>
-            <div className="mt-4 space-y-1.5 border-t border-border pt-4 text-sm">
-              <div className="flex justify-between text-fg-muted">
-                <span>Товары</span>
-                <span>{formatPrice(total)}</span>
-              </div>
-              <div className="flex justify-between text-fg-muted">
-                <span>Доставка</span>
-                <span>{delivery === "pickup" ? "0 ₽" : "рассчитается"}</span>
-              </div>
-              <div className="flex justify-between pt-2 font-display text-lg font-bold">
-                <span>Итого</span>
-                <span>{formatPrice(total)}</span>
-              </div>
+            <div className="mt-4 flex justify-between border-t border-border pt-4 font-display text-lg font-bold">
+              <span>Итоговая сумма</span>
+              <span>{formatPrice(total)}</span>
             </div>
             <button
               type="submit"
-              className="mt-5 w-full rounded-xl bg-gold py-3.5 font-semibold text-black transition-colors hover:bg-gold-2"
+              disabled={sending}
+              className="mt-5 w-full rounded-xl bg-gold py-3.5 font-semibold text-black transition-colors hover:bg-gold-2 disabled:opacity-60"
             >
-              Подтвердить заказ
+              {sending ? "Отправляем…" : "Оформить заказ"}
             </button>
-            <p className="mt-2 text-center text-[11px] text-fg-dim">
-              Нажимая, вы соглашаетесь с политикой конфиденциальности
-            </p>
           </div>
         </aside>
       </form>
@@ -186,30 +129,18 @@ export default function CheckoutPage() {
   );
 }
 
-function Fieldset({
-  title,
-  children,
+function Field({
+  label, value, onChange, type = "text", required, placeholder,
 }: {
-  title: string;
-  children: React.ReactNode;
+  label: string; value: string; onChange: (v: string) => void;
+  type?: string; required?: boolean; placeholder?: string;
 }) {
   return (
-    <div className="surface-card rounded-2xl p-5">
-      <h3 className="mb-4 font-semibold">{title}</h3>
-      <div className="space-y-3">{children}</div>
-    </div>
-  );
-}
-
-function Field({
-  label,
-  ...props
-}: { label: string } & React.InputHTMLAttributes<HTMLInputElement>) {
-  return (
     <label className="block">
-      <span className="mb-1 block text-xs text-fg-muted">{label}</span>
+      <span className="mb-1 block text-xs text-fg-muted">{label}{required && <span className="text-gold"> *</span>}</span>
       <input
-        {...props}
+        type={type} value={value} required={required} placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value)}
         className="w-full rounded-lg border border-border-strong bg-bg px-3 py-2.5 text-sm outline-none placeholder:text-fg-dim focus:border-gold"
       />
     </label>

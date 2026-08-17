@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCart, formatPrice } from "@/lib/cart";
-import { productBySlug } from "@/lib/catalog";
+import { productBySlug } from "@/lib/shop";
 import ProductImage from "./ProductImage";
 
 export default function CartDrawer() {
@@ -23,10 +23,7 @@ export default function CartDrawer() {
       >
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <h2 className="font-display text-lg font-semibold">
-            Корзина{" "}
-            <span className="text-fg-dim">
-              {count > 0 ? `· ${count}` : ""}
-            </span>
+            Корзина <span className="text-fg-dim">{count > 0 ? `· ${count}` : ""}</span>
           </h2>
           <button
             onClick={() => setOpen(false)}
@@ -61,7 +58,7 @@ export default function CartDrawer() {
                   >
                     <ProductImage
                       product={p}
-                      compact
+                      sizes="64px"
                       className="h-16 w-16 shrink-0 rounded-lg"
                     />
                     <div className="flex flex-1 flex-col">
@@ -76,9 +73,7 @@ export default function CartDrawer() {
                           >
                             −
                           </button>
-                          <span className="min-w-6 text-center text-sm">
-                            {line.qty}
-                          </span>
+                          <span className="min-w-6 text-center text-sm">{line.qty}</span>
                           <button
                             onClick={() => setQty(line.slug, line.qty + 1)}
                             className="px-2.5 py-1 text-fg-muted hover:text-gold"
@@ -87,7 +82,7 @@ export default function CartDrawer() {
                           </button>
                         </div>
                         <span className="text-sm font-semibold">
-                          {formatPrice(p.price * line.qty)}
+                          {p.price ? formatPrice(p.price * line.qty) : "—"}
                         </span>
                       </div>
                     </div>
@@ -106,9 +101,7 @@ export default function CartDrawer() {
             <div className="border-t border-border px-5 py-4">
               <div className="mb-3 flex items-center justify-between">
                 <span className="text-fg-muted">Итого</span>
-                <span className="font-display text-xl font-bold">
-                  {formatPrice(total)}
-                </span>
+                <span className="font-display text-xl font-bold">{formatPrice(total)}</span>
               </div>
               <Link
                 href="/checkout"
@@ -117,9 +110,6 @@ export default function CartDrawer() {
               >
                 Оформить заказ
               </Link>
-              <p className="mt-2 text-center text-[11px] text-fg-dim">
-                Прототип · оплата подключается на этапе MVP
-              </p>
             </div>
           </>
         )}

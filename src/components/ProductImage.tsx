@@ -1,7 +1,6 @@
-import type { Product } from "@/lib/catalog";
+import Image from "next/image";
+import type { Product } from "@/lib/shop";
 
-// Брендовая заглушка вместо фото (на прототипе фото нет).
-// На MVP заменяется на next/image с реальными снимками товара.
 const brandStyle: Record<string, { from: string; to: string; mark: string }> = {
   "Koch Chemie": { from: "#1f2a44", to: "#0c1120", mark: "KC" },
   "Shine Systems": { from: "#3a2a12", to: "#140d05", mark: "SS" },
@@ -9,49 +8,53 @@ const brandStyle: Record<string, { from: string; to: string; mark: string }> = {
   CarShine: { from: "#123033", to: "#06171a", mark: "CS" },
 };
 
+function initials(brand: string) {
+  if (!brand) return "CS";
+  const parts = brand.split(/\s+/).filter(Boolean);
+  return (parts[0]?.[0] ?? "C") + (parts[1]?.[0] ?? parts[0]?.[1] ?? "");
+}
+
 export default function ProductImage({
   product,
   className = "",
-  compact = false,
+  sizes = "(max-width: 768px) 50vw, 25vw",
+  priority = false,
 }: {
   product: Product;
   className?: string;
-  compact?: boolean;
+  sizes?: string;
+  priority?: boolean;
 }) {
-  const b = brandStyle[product.brand] ?? brandStyle.CarShine;
+  if (product.photo) {
+    return (
+      <div className={`relative overflow-hidden bg-[#f4f4f2] ${className}`}>
+        <Image
+          src={product.photo}
+          alt={product.title}
+          fill
+          sizes={sizes}
+          priority={priority}
+          className="object-contain p-3"
+        />
+      </div>
+    );
+  }
+
+  // Фолбэк — брендовая заглушка (для товаров без фото)
+  const b = brandStyle[product.brand] ?? {
+    from: "#20242c",
+    to: "#0c0f13",
+    mark: initials(product.brand).toUpperCase(),
+  };
   return (
     <div
-      className={`relative overflow-hidden ${className}`}
-      style={{
-        background: `radial-gradient(120% 90% at 50% 0%, ${b.from}, ${b.to})`,
-      }}
+      className={`relative flex items-center justify-center overflow-hidden ${className}`}
+      style={{ background: `radial-gradient(120% 90% at 50% 0%, ${b.from}, ${b.to})` }}
       aria-hidden
     >
-      {/* глянцевый блик */}
-      <div className="absolute inset-0 gloss" />
-      <div
-        className="absolute left-1/2 top-1/2 h-[62%] w-[30%] -translate-x-1/2 -translate-y-1/2 rounded-[14px] rounded-t-[40px]"
-        style={{
-          background:
-            "linear-gradient(100deg, rgba(255,255,255,0.10), rgba(255,255,255,0.02))",
-          border: "1px solid rgba(255,255,255,0.12)",
-          boxShadow: "inset 0 20px 40px rgba(255,255,255,0.06)",
-        }}
-      />
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span
-          className={`font-display font-semibold tracking-wide text-white/85 ${
-            compact ? "text-xl" : "text-3xl"
-          }`}
-        >
-          {b.mark}
-        </span>
-      </div>
-      {product.brand && (
-        <span className="absolute bottom-2 left-3 text-[10px] uppercase tracking-widest text-white/45">
-          {product.brand}
-        </span>
-      )}
+      <span className="font-display text-2xl font-semibold text-white/80">
+        {b.mark}
+      </span>
     </div>
   );
 }

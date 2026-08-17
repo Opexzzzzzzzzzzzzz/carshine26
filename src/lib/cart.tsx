@@ -9,7 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { formatPrice, productBySlug } from "./catalog";
+import { formatPrice, productBySlug } from "./shop";
 
 export type CartLine = { slug: string; qty: number };
 
@@ -87,7 +87,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const count = state.lines.reduce((s, l) => s + l.qty, 0);
     const total = state.lines.reduce((s, l) => {
       const p = productBySlug(l.slug);
-      return s + (p ? p.price * l.qty : 0);
+      return s + (p && p.price ? p.price * l.qty : 0);
     }, 0);
     return {
       lines: state.lines,
