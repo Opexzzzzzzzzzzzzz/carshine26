@@ -8,12 +8,13 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import type { CartSnapshot } from "./shop";
 
 type FavContextValue = {
-  ids: string[];
+  items: CartSnapshot[];
   count: number;
   has: (slug: string) => boolean;
-  toggle: (slug: string) => void;
+  toggle: (item: CartSnapshot) => void;
   remove: (slug: string) => void;
   open: boolean;
   setOpen: (v: boolean) => void;
@@ -23,36 +24,38 @@ const FavContext = createContext<FavContextValue | null>(null);
 const KEY = "carshine_favorites";
 
 export function FavoritesProvider({ children }: { children: ReactNode }) {
-  const [ids, setIds] = useState<string[]>([]);
+  const [items, setItems] = useState<CartSnapshot[]>([]);
   const [open, setOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem(KEY);
-      if (raw) setIds(JSON.parse(raw));
+      if (raw) setItems(JSON.parse(raw));
     } catch {}
     setHydrated(true);
   }, []);
 
   useEffect(() => {
-    if (hydrated) localStorage.setItem(KEY, JSON.stringify(ids));
-  }, [ids, hydrated]);
+    if (hydrated) localStorage.setItem(KEY, JSON.stringify(items));
+  }, [items, hydrated]);
 
   const value = useMemo<FavContextValue>(
     () => ({
-      ids,
-      count: ids.length,
-      has: (slug) => ids.includes(slug),
-      toggle: (slug) =>
-        setIds((prev) =>
-          prev.includes(slug) ? prev.filter((x) => x !== slug) : [...prev, slug]
+      items,
+      count: items.length,
+      has: (slug) => items.some((i) => i.slug === slug),
+      toggle: (item) =>
+        setItems((prev) =>
+          prev.some((i) => i.slug === item.slug)
+            ? prev.filter((i) => i.slug !== item.slug)
+            : [...prev, item]
         ),
-      remove: (slug) => setIds((prev) => prev.filter((x) => x !== slug)),
+      remove: (slug) => setItems((prev) => prev.filter((i) => i.slug !== slug)),
       open,
       setOpen,
     }),
-    [ids, open]
+    [items, open]
   );
 
   return <FavContext.Provider value={value}>{children}</FavContext.Provider>;

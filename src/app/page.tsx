@@ -1,9 +1,12 @@
 import Link from "next/link";
-import { groups, featuredProducts, allBrands, totalProducts, categoriesOfGroup } from "@/lib/shop";
+import { groups, allBrands, totalProducts, categoriesOfGroup } from "@/lib/shop";
+import { featuredProductsLite } from "@/lib/queries";
 import ProductCard from "@/components/ProductCard";
 
-export default function Home() {
-  const featured = featuredProducts(8);
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const featured = await featuredProductsLite(8);
 
   return (
     <>

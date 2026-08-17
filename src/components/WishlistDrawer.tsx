@@ -3,13 +3,12 @@
 import Link from "next/link";
 import { useFavorites } from "@/lib/favorites";
 import { useCart } from "@/lib/cart";
-import { productBySlug, formatPrice } from "@/lib/shop";
+import { formatPrice } from "@/lib/shop";
 import ProductImage from "./ProductImage";
 
 export default function WishlistDrawer() {
   const fav = useFavorites();
   const { add } = useCart();
-  const items = fav.ids.map(productBySlug).filter(Boolean);
 
   return (
     <>
@@ -37,7 +36,7 @@ export default function WishlistDrawer() {
           </button>
         </div>
 
-        {items.length === 0 ? (
+        {fav.items.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
             <div className="text-4xl opacity-40">🤍</div>
             <p className="text-fg-muted">В избранном пока пусто</p>
@@ -50,36 +49,30 @@ export default function WishlistDrawer() {
           </div>
         ) : (
           <div className="scroll-thin flex-1 space-y-3 overflow-y-auto px-4 py-4">
-            {items.map((p) => (
-              <div key={p!.slug} className="flex gap-3 rounded-xl border border-border bg-surface p-2.5">
-                <Link href={`/product/${p!.slug}`} onClick={() => fav.setOpen(false)}>
-                  <ProductImage product={p!} sizes="64px" className="h-16 w-16 shrink-0 rounded-lg" />
+            {fav.items.map((p) => (
+              <div key={p.slug} className="flex gap-3 rounded-xl border border-border bg-surface p-2.5">
+                <Link href={`/product/${p.slug}`} onClick={() => fav.setOpen(false)}>
+                  <ProductImage product={{ photo: p.photo, title: p.title }} sizes="64px" className="h-16 w-16 shrink-0 rounded-lg" />
                 </Link>
                 <div className="flex flex-1 flex-col">
                   <Link
-                    href={`/product/${p!.slug}`}
+                    href={`/product/${p.slug}`}
                     onClick={() => fav.setOpen(false)}
                     className="line-clamp-2 text-xs font-medium leading-snug hover:text-gold"
                   >
-                    {p!.title}
+                    {p.title}
                   </Link>
                   <div className="mt-auto flex items-center justify-between pt-2">
-                    <span className="text-sm font-semibold">{formatPrice(p!.price)}</span>
+                    <span className="text-sm font-semibold">{formatPrice(p.price)}</span>
                     <button
-                      onClick={() => add(p!.slug)}
+                      onClick={() => add(p)}
                       className="rounded-lg bg-gold px-2.5 py-1.5 text-xs font-semibold text-black hover:bg-gold-2"
                     >
                       В корзину
                     </button>
                   </div>
                 </div>
-                <button
-                  onClick={() => fav.remove(p!.slug)}
-                  className="self-start text-fg-dim hover:text-danger"
-                  aria-label="Убрать"
-                >
-                  ✕
-                </button>
+                <button onClick={() => fav.remove(p.slug)} className="self-start text-fg-dim hover:text-danger" aria-label="Убрать">✕</button>
               </div>
             ))}
           </div>

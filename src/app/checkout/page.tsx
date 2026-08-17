@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useCart, formatPrice } from "@/lib/cart";
-import { productBySlug } from "@/lib/shop";
 import ProductImage from "@/components/ProductImage";
 
 export default function CheckoutPage() {
@@ -20,12 +19,12 @@ export default function CheckoutPage() {
     if (!agree) { setError("Подтвердите согласие с политикой конфиденциальности"); return; }
     setSending(true);
     try {
-      const items = lines
-        .map((l) => {
-          const p = productBySlug(l.slug);
-          return p ? { title: p.title, qty: l.qty, price: p.price, sum: (p.price ?? 0) * l.qty } : null;
-        })
-        .filter(Boolean);
+      const items = lines.map((l) => ({
+        title: l.title,
+        qty: l.qty,
+        price: l.price,
+        sum: (l.price ?? 0) * l.qty,
+      }));
       const res = await fetch("/api/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -96,20 +95,16 @@ export default function CheckoutPage() {
           <div className="surface-card rounded-2xl p-5">
             <h3 className="mb-4 font-semibold">Ваш заказ</h3>
             <div className="scroll-thin max-h-72 space-y-3 overflow-y-auto">
-              {lines.map((l) => {
-                const p = productBySlug(l.slug);
-                if (!p) return null;
-                return (
-                  <div key={l.slug} className="flex items-center gap-3">
-                    <ProductImage product={p} sizes="48px" className="h-12 w-12 shrink-0 rounded-lg" />
-                    <div className="min-w-0 flex-1">
-                      <div className="line-clamp-2 text-xs">{p.title}</div>
-                      <div className="text-xs text-fg-dim">{l.qty} × {formatPrice(p.price)}</div>
-                    </div>
-                    <div className="text-sm font-medium">{p.price ? formatPrice(p.price * l.qty) : "—"}</div>
+              {lines.map((l) => (
+                <div key={l.slug} className="flex items-center gap-3">
+                  <ProductImage product={{ photo: l.photo, title: l.title }} sizes="48px" className="h-12 w-12 shrink-0 rounded-lg" />
+                  <div className="min-w-0 flex-1">
+                    <div className="line-clamp-2 text-xs">{l.title}</div>
+                    <div className="text-xs text-fg-dim">{l.qty} × {formatPrice(l.price)}</div>
                   </div>
-                );
-              })}
+                  <div className="text-sm font-medium">{l.price ? formatPrice(l.price * l.qty) : "—"}</div>
+                </div>
+              ))}
             </div>
             <div className="mt-4 flex justify-between border-t border-border pt-4 font-display text-lg font-bold">
               <span>Итоговая сумма</span>

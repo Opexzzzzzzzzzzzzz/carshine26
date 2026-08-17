@@ -1,14 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import {
-  productBySlug,
-  categoryBySlug,
-  groupBySlug,
-  relatedProducts,
-  toLite,
-  formatPrice,
-} from "@/lib/shop";
+import { categoryBySlug, groupBySlug, formatPrice } from "@/lib/shop";
+import { getProductBySlug, relatedProductsLite } from "@/lib/queries";
 import ProductGallery from "@/components/ProductGallery";
 import ProductCard from "@/components/ProductCard";
 import ProductActions from "@/components/ProductActions";
@@ -19,7 +13,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const p = productBySlug(slug);
+  const p = await getProductBySlug(slug);
   if (!p) return {};
   const desc = (p.description || `${p.title}. Купить в CarShine.`).slice(0, 300);
   return {
@@ -35,12 +29,12 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const p = productBySlug(slug);
+  const p = await getProductBySlug(slug);
   if (!p) notFound();
 
   const cat = categoryBySlug(p.category);
   const group = cat ? groupBySlug(cat.group) : undefined;
-  const related = toLite(relatedProducts(p));
+  const related = await relatedProductsLite(p);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -95,7 +89,7 @@ export default async function ProductPage({
           </div>
 
           <div className="mt-8">
-            <ProductActions slug={p.slug} />
+            <ProductActions item={{ slug: p.slug, title: p.title, price: p.price, photo: p.photo }} />
           </div>
 
           <a

@@ -9,13 +9,13 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { formatPrice, productBySlug } from "./shop";
+import { formatPrice, type CartSnapshot } from "./shop";
 
-export type CartLine = { slug: string; qty: number };
+export type CartLine = CartSnapshot & { qty: number };
 
 type State = { lines: CartLine[] };
 type Action =
-  | { type: "add"; slug: string; qty?: number }
+  | { type: "add"; item: CartSnapshot; qty?: number }
   | { type: "remove"; slug: string }
   | { type: "setQty"; slug: string; qty: number }
   | { type: "clear" }
@@ -24,15 +24,15 @@ type Action =
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case "add": {
-      const existing = state.lines.find((l) => l.slug === action.slug);
+      const existing = state.lines.find((l) => l.slug === action.item.slug);
       if (existing) {
         return {
           lines: state.lines.map((l) =>
-            l.slug === action.slug ? { ...l, qty: l.qty + (action.qty ?? 1) } : l
+            l.slug === action.item.slug ? { ...l, qty: l.qty + (action.qty ?? 1) } : l
           ),
         };
       }
-      return { lines: [...state.lines, { slug: action.slug, qty: action.qty ?? 1 }] };
+      return { lines: [...state.lines, { ...action.item, qty: action.qty ?? 1 }] };
     }
     case "remove":
       return { lines: state.lines.filter((l) => l.slug !== action.slug) };
@@ -55,7 +55,7 @@ type CartContextValue = {
   lines: CartLine[];
   count: number;
   total: number;
-  add: (slug: string, qty?: number) => void;
+  add: (item: CartSnapshot, qty?: number) => void;
   remove: (slug: string) => void;
   setQty: (slug: string, qty: number) => void;
   clear: () => void;
@@ -85,16 +85,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<CartContextValue>(() => {
     const count = state.lines.reduce((s, l) => s + l.qty, 0);
-    const total = state.lines.reduce((s, l) => {
-      const p = productBySlug(l.slug);
-      return s + (p && p.price ? p.price * l.qty : 0);
-    }, 0);
+    const total = state.lines.reduce((s, l) => s + (l.price ? l.price * l.qty : 0), 0);
     return {
       lines: state.lines,
       count,
       total,
-      add: (slug, qty) => {
-        dispatch({ type: "add", slug, qty });
+      add: (item, qty) => {
+        dispatch({ type: "add", item, qty });
         setOpen(true);
       },
       remove: (slug) => dispatch({ type: "remove", slug }),

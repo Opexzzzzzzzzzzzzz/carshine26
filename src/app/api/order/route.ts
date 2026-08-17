@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
 
 type Item = { title: string; qty: number; price: number | null; sum: number };
 type OrderPayload = {
@@ -27,8 +28,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "empty" }, { status: 400 });
   }
 
+  // Сохраняем заявку в БД (видна в админке даже если Telegram не настроен).
+  const order = await prisma.order.create({
+    data: {
+      name: data.name ?? "",
+      email: data.email ?? "",
+      phone: data.phone,
+      promo: data.promo ?? "",
+      total: Math.round(data.total ?? 0),
+      itemsJson: JSON.stringify(items),
+    },
+  });
+
   const lines = [
-    "🛒 <b>Новый заказ с сайта CarShine</b>",
+    `🛒 <b>Новый заказ #${order.id} — CarShine</b>`,
     "",
     `👤 <b>Имя:</b> ${esc(data.name || "—")}`,
     `📞 <b>Телефон:</b> ${esc(data.phone || "—")}`,
@@ -63,9 +76,11 @@ export async function POST(req: Request) {
     });
     if (!tg.ok) {
       console.error("[ORDER] Telegram error", await tg.text());
-      return NextResponse.json({ ok: false, error: "telegram" }, { status: 502 });
+      // Заказ уже сохранён в БД — считаем принятым, доставим уведомление позже.
+      return NextResponse.json({ ok: true, delivered: false, id: order.id });
     }
-    return NextResponse.json({ ok: true, delivered: true });
+    await prisma.order.update({ where: { id: order.id }, data: { delivered: true } });
+    return NextResponse.json({ ok: true, delivered: true, id: order.id });
   } catch (e) {
     console.error("[ORDER] Telegram exception", e);
     return NextResponse.json({ ok: false, error: "network" }, { status: 502 });

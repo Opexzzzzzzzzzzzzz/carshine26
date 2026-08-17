@@ -11,11 +11,17 @@ export default function ProductCard({ product }: { product: Product }) {
   const { add } = useCart();
   const fav = useFavorites();
   const liked = fav.has(product.slug);
+  const snapshot = {
+    slug: product.slug,
+    title: product.title,
+    price: product.price,
+    photo: product.photo,
+  };
 
   return (
     <div className="group surface-card relative flex flex-col overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:border-border-strong hover:shadow-[0_20px_50px_-20px_rgba(0,0,0,0.8)]">
       <button
-        onClick={() => fav.toggle(product.slug)}
+        onClick={() => fav.toggle(snapshot)}
         className={`absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full backdrop-blur transition-colors ${
           liked
             ? "bg-gold/20 text-gold"
@@ -61,7 +67,7 @@ export default function ProductCard({ product }: { product: Product }) {
             {formatPrice(product.price)}
           </div>
           <button
-            onClick={() => add(product.slug)}
+            onClick={() => add(snapshot)}
             className="shine-sweep relative overflow-hidden rounded-xl bg-gold px-3.5 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-gold-2 active:scale-95"
             aria-label="В корзину"
           >

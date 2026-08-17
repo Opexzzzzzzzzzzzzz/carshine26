@@ -46,3 +46,10 @@ discover.mjs
 discover2.mjs
 net.mjs
 verify2.mjs
+
+# env & prisma
+.env
+/prisma/dev.db
+/prisma/dev.db-journal
+shots3/
+adminshots.mjs

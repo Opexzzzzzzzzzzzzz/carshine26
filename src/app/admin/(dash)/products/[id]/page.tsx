@@ -1,0 +1,102 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { prisma } from "@/lib/db";
+import { categories } from "@/lib/shop";
+import { updateProduct, deleteProduct, aiDescribe } from "../../../actions";
+
+export const dynamic = "force-dynamic";
+
+export default async function EditProduct({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ created?: string }>;
+}) {
+  const { id } = await params;
+  const { created } = await searchParams;
+  const p = await prisma.product.findUnique({ where: { id } });
+  if (!p) notFound();
+
+  return (
+    <div className="max-w-3xl space-y-5">
+      <div className="flex items-center justify-between">
+        <Link href="/admin/products" className="text-sm text-fg-muted hover:text-gold">← К товарам</Link>
+        <Link href={`/product/${p.slug}`} className="text-sm text-fg-muted hover:text-gold">Открыть на сайте ↗</Link>
+      </div>
+      <h1 className="font-display text-2xl font-bold">Редактирование товара</h1>
+      {created && <div className="rounded-lg bg-success/10 px-4 py-2 text-sm text-success">Товар создан</div>}
+
+      <form action={updateProduct} className="surface-card space-y-4 rounded-2xl p-6">
+        <input type="hidden" name="id" value={p.id} />
+
+        <Field label="Название">
+          <input name="title" defaultValue={p.title} required className={inputCls} />
+        </Field>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Бренд">
+            <input name="brand" defaultValue={p.brand} className={inputCls} />
+          </Field>
+          <Field label="Цена, ₽ (пусто = по запросу)">
+            <input name="price" defaultValue={p.price ?? ""} inputMode="numeric" className={inputCls} />
+          </Field>
+        </div>
+
+        <Field label="Категория">
+          <select name="categorySlug" defaultValue={p.categorySlug} className={inputCls}>
+            {categories.map((c) => (
+              <option key={c.slug} value={c.slug}>{c.title}</option>
+            ))}
+          </select>
+        </Field>
+
+        <Field label="Главное фото (URL)">
+          <input name="photo" defaultValue={p.photo} className={inputCls} />
+        </Field>
+
+        <Field label="Описание">
+          <textarea name="description" defaultValue={p.description} rows={8} className={inputCls} />
+        </Field>
+
+        <label className="flex cursor-pointer items-center gap-2.5 text-sm text-fg-muted">
+          <input type="checkbox" name="inStock" defaultChecked={p.inStock} className="h-4 w-4 accent-[var(--gold)]" />
+          В наличии
+        </label>
+
+        <div className="flex gap-3 pt-2">
+          <button className="rounded-xl bg-gold px-6 py-3 font-semibold text-black hover:bg-gold-2">Сохранить</button>
+        </div>
+      </form>
+
+      <div className="flex flex-wrap items-center gap-3">
+        <form action={aiDescribe}>
+          <input type="hidden" name="id" value={p.id} />
+          <button className="rounded-xl border border-gold/40 bg-gold/10 px-5 py-2.5 text-sm font-semibold text-gold hover:bg-gold/20">
+            ✨ Сгенерировать описание ИИ
+          </button>
+        </form>
+        <span className="text-xs text-fg-dim">Заполнит поле описания. Нужен ключ GLM_API_KEY, иначе — черновик-заглушка.</span>
+      </div>
+
+      <form action={deleteProduct} className="border-t border-border pt-5">
+        <input type="hidden" name="id" value={p.id} />
+        <button className="rounded-xl border border-danger/40 px-5 py-2.5 text-sm text-danger hover:bg-danger/10">
+          Удалить товар
+        </button>
+      </form>
+    </div>
+  );
+}
+
+const inputCls =
+  "w-full rounded-lg border border-border-strong bg-bg px-3 py-2.5 text-sm outline-none focus:border-gold";
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-xs text-fg-muted">{label}</span>
+      {children}
+    </label>
+  );
+}

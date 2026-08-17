@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+  // native — для локальной сборки; debian — для деплоя на Ubuntu-сервер
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  slug     String    @id
+  title    String
+  group    String
+  products Product[]
+}
+
+model Product {
+  id           String   @id
+  slug         String   @unique
+  title        String
+  brand        String   @default("")
+  price        Int?
+  categorySlug String
+  category     Category @relation(fields: [categorySlug], references: [slug])
+  description  String   @default("")
+  photo        String   @default("")
+  photosJson   String   @default("[]")
+  inStock      Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([categorySlug])
+  @@index([brand])
+}
+
+model Order {
+  id        Int      @id @default(autoincrement())
+  name      String   @default("")
+  email     String   @default("")
+  phone     String
+  promo     String   @default("")
+  total     Int      @default(0)
+  itemsJson String   @default("[]")
+  status    String   @default("new")
+  delivered Boolean  @default(false)
+  createdAt DateTime @default(now())
+}

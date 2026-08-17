@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useCart, formatPrice } from "@/lib/cart";
-import { productBySlug } from "@/lib/shop";
 import ProductImage from "./ProductImage";
 
 export default function CartDrawer() {
@@ -48,54 +47,29 @@ export default function CartDrawer() {
         ) : (
           <>
             <div className="scroll-thin flex-1 space-y-3 overflow-y-auto px-4 py-4">
-              {lines.map((line) => {
-                const p = productBySlug(line.slug);
-                if (!p) return null;
-                return (
-                  <div
-                    key={line.slug}
-                    className="flex gap-3 rounded-xl border border-border bg-surface p-2.5"
-                  >
-                    <ProductImage
-                      product={p}
-                      sizes="64px"
-                      className="h-16 w-16 shrink-0 rounded-lg"
-                    />
-                    <div className="flex flex-1 flex-col">
-                      <div className="line-clamp-2 text-xs font-medium leading-snug">
-                        {p.title}
+              {lines.map((line) => (
+                <div key={line.slug} className="flex gap-3 rounded-xl border border-border bg-surface p-2.5">
+                  <ProductImage
+                    product={{ photo: line.photo, title: line.title }}
+                    sizes="64px"
+                    className="h-16 w-16 shrink-0 rounded-lg"
+                  />
+                  <div className="flex flex-1 flex-col">
+                    <div className="line-clamp-2 text-xs font-medium leading-snug">{line.title}</div>
+                    <div className="mt-auto flex items-center justify-between pt-2">
+                      <div className="flex items-center rounded-lg border border-border-strong">
+                        <button onClick={() => setQty(line.slug, line.qty - 1)} className="px-2.5 py-1 text-fg-muted hover:text-gold">−</button>
+                        <span className="min-w-6 text-center text-sm">{line.qty}</span>
+                        <button onClick={() => setQty(line.slug, line.qty + 1)} className="px-2.5 py-1 text-fg-muted hover:text-gold">+</button>
                       </div>
-                      <div className="mt-auto flex items-center justify-between pt-2">
-                        <div className="flex items-center rounded-lg border border-border-strong">
-                          <button
-                            onClick={() => setQty(line.slug, line.qty - 1)}
-                            className="px-2.5 py-1 text-fg-muted hover:text-gold"
-                          >
-                            −
-                          </button>
-                          <span className="min-w-6 text-center text-sm">{line.qty}</span>
-                          <button
-                            onClick={() => setQty(line.slug, line.qty + 1)}
-                            className="px-2.5 py-1 text-fg-muted hover:text-gold"
-                          >
-                            +
-                          </button>
-                        </div>
-                        <span className="text-sm font-semibold">
-                          {p.price ? formatPrice(p.price * line.qty) : "—"}
-                        </span>
-                      </div>
+                      <span className="text-sm font-semibold">
+                        {line.price ? formatPrice(line.price * line.qty) : "—"}
+                      </span>
                     </div>
-                    <button
-                      onClick={() => remove(line.slug)}
-                      className="self-start text-fg-dim hover:text-danger"
-                      aria-label="Удалить"
-                    >
-                      ✕
-                    </button>
                   </div>
-                );
-              })}
+                  <button onClick={() => remove(line.slug)} className="self-start text-fg-dim hover:text-danger" aria-label="Удалить">✕</button>
+                </div>
+              ))}
             </div>
 
             <div className="border-t border-border px-5 py-4">

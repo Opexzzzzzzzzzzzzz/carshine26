@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
-import { searchProducts, toLite } from "@/lib/shop";
+import { searchProductsLite } from "@/lib/queries";
 
 export const metadata: Metadata = { title: "Поиск" };
 
@@ -11,7 +11,7 @@ export default async function SearchPage({
   searchParams: Promise<{ q?: string }>;
 }) {
   const { q = "" } = await searchParams;
-  const results = toLite(searchProducts(q, 120));
+  const results = await searchProductsLite(q, 120);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">

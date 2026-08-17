@@ -1,5 +1,6 @@
 import Image from "next/image";
-import type { Product } from "@/lib/shop";
+
+type ImgProduct = { photo: string; title: string; brand?: string };
 
 const brandStyle: Record<string, { from: string; to: string; mark: string }> = {
   "Koch Chemie": { from: "#1f2a44", to: "#0c1120", mark: "KC" },
@@ -20,7 +21,7 @@ export default function ProductImage({
   sizes = "(max-width: 768px) 50vw, 25vw",
   priority = false,
 }: {
-  product: Product;
+  product: ImgProduct;
   className?: string;
   sizes?: string;
   priority?: boolean;
@@ -41,10 +42,11 @@ export default function ProductImage({
   }
 
   // Фолбэк — брендовая заглушка (для товаров без фото)
-  const b = brandStyle[product.brand] ?? {
+  const brand = product.brand ?? "";
+  const b = brandStyle[brand] ?? {
     from: "#20242c",
     to: "#0c0f13",
-    mark: initials(product.brand).toUpperCase(),
+    mark: initials(brand).toUpperCase(),
   };
   return (
     <div

@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import CatalogView from "@/components/CatalogView";
-import { groups, groupBySlug, productsByGroupLite, categoriesOfGroup } from "@/lib/shop";
+import { groups, groupBySlug, categoriesOfGroup } from "@/lib/shop";
+import { productsByGroupLite } from "@/lib/queries";
 
 export function generateStaticParams() {
   return groups.map((g) => ({ group: g.slug }));
@@ -34,7 +35,7 @@ export default async function GroupPage({
   const g = groupBySlug(group);
   if (!g) notFound();
 
-  const list = productsByGroupLite(group);
+  const list = await productsByGroupLite(group);
   const cats = categoriesOfGroup(group);
 
   return (

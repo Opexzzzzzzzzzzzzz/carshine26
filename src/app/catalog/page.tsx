@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import CatalogView from "@/components/CatalogView";
-import { allProductsLite, totalProducts } from "@/lib/shop";
+import { totalProducts } from "@/lib/shop";
+import { allProductsLite } from "@/lib/queries";
 
 export const metadata: Metadata = {
   title: "Каталог — вся автохимия и оборудование для детейлинга",
@@ -8,8 +9,10 @@ export const metadata: Metadata = {
     "Полный каталог CarShine: полировка, мойка и уход, оборудование, аксессуары, плёнка и наборы. Более 1700 товаров.",
 };
 
-export default function CatalogPage() {
-  const list = allProductsLite();
+export const dynamic = "force-dynamic";
+
+export default async function CatalogPage() {
+  const list = await allProductsLite();
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
       <nav className="mb-2 text-xs text-fg-dim">Главная / Каталог</nav>

@@ -1,9 +1,11 @@
 import type { MetadataRoute } from "next";
-import { groups, products } from "@/lib/shop";
+import { groups } from "@/lib/shop";
+import { prisma } from "@/lib/db";
 
 const base = "https://carshine26.ru";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const products = await prisma.product.findMany({ select: { slug: true } });
   return [
     { url: base, priority: 1 },
     { url: `${base}/catalog`, priority: 0.9 },
