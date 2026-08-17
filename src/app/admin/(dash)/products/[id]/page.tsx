@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { categories } from "@/lib/shop";
-import { updateProduct, deleteProduct, aiDescribe } from "../../../actions";
+import { updateProduct, deleteProduct } from "../../../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -68,16 +68,6 @@ export default async function EditProduct({
           <button className="rounded-xl bg-gold px-6 py-3 font-semibold text-black hover:bg-gold-2">Сохранить</button>
         </div>
       </form>
-
-      <div className="flex flex-wrap items-center gap-3">
-        <form action={aiDescribe}>
-          <input type="hidden" name="id" value={p.id} />
-          <button className="rounded-xl border border-gold/40 bg-gold/10 px-5 py-2.5 text-sm font-semibold text-gold hover:bg-gold/20">
-            ✨ Сгенерировать описание ИИ
-          </button>
-        </form>
-        <span className="text-xs text-fg-dim">Заполнит поле описания. Нужен ключ GLM_API_KEY, иначе — черновик-заглушка.</span>
-      </div>
 
       <form action={deleteProduct} className="border-t border-border pt-5">
         <input type="hidden" name="id" value={p.id} />

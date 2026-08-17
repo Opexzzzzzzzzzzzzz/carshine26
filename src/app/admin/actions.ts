@@ -4,7 +4,6 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
-import { generateProductDescription } from "@/lib/ai";
 
 function toPrice(v: FormDataEntryValue | null): number | null {
   const s = String(v ?? "").replace(/\s/g, "").replace(",", ".");
@@ -72,20 +71,6 @@ export async function createProduct(formData: FormData) {
   });
   revalidatePath("/admin/products");
   redirect(`/admin/products/${id}?created=1`);
-}
-
-export async function aiDescribe(formData: FormData) {
-  await requireAuth();
-  const id = String(formData.get("id"));
-  const p = await prisma.product.findUnique({ where: { id } });
-  if (!p) return;
-  const text = await generateProductDescription({
-    title: p.title,
-    brand: p.brand,
-    category: p.categorySlug,
-  });
-  await prisma.product.update({ where: { id }, data: { description: text } });
-  revalidatePath(`/admin/products/${id}`);
 }
 
 export async function setOrderStatus(formData: FormData) {
