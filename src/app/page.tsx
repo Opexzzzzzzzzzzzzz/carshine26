@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { groups, allBrands, totalProducts, categoriesOfGroup } from "@/lib/shop";
+import { groups, allBrands, totalProducts, categoriesOfGroup, plural } from "@/lib/shop";
 import { featuredProductsLite } from "@/lib/queries";
 import ProductCard from "@/components/ProductCard";
 import CategoryIcon from "@/components/CategoryIcon";
@@ -40,7 +40,7 @@ export default async function Home() {
             <div className="mt-10 flex flex-wrap gap-x-8 gap-y-4">
               {[
                 [`${totalProducts.toLocaleString("ru-RU")}+`, "товаров в каталоге"],
-                [`${allBrands.length} брендов`, "профессионального уровня"],
+                [`${allBrands.length} ${plural(allBrands.length, ["бренд", "бренда", "брендов"])}`, "профессионального уровня"],
                 ["CDEK", "доставка по России"],
               ].map(([a, b]) => (
                 <div key={b}>
