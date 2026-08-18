@@ -2,6 +2,7 @@ import Link from "next/link";
 import { groups, allBrands, totalProducts, categoriesOfGroup } from "@/lib/shop";
 import { featuredProductsLite } from "@/lib/queries";
 import ProductCard from "@/components/ProductCard";
+import CategoryIcon from "@/components/CategoryIcon";
 
 export const dynamic = "force-dynamic";
 
@@ -19,9 +20,10 @@ export default async function Home() {
               ★ Профессиональная автохимия · Ставрополь
             </span>
             <h1 className="font-display text-4xl font-bold leading-[1.1] sm:text-5xl lg:text-6xl">
-              Идеальный блеск
+              Ваш детейлинг
               <br />
-              начинается с <span className="text-gold-gradient">CarShine</span>
+              начинается здесь.{" "}
+              <span className="text-gold-gradient">CarShine26</span>
             </h1>
             <p className="mt-6 max-w-lg text-lg leading-relaxed text-fg-muted">
               Полироли, пасты, керамика, оборудование и аксессуары для детейлинга.
@@ -31,8 +33,8 @@ export default async function Home() {
               <Link href="/catalog" className="shine-sweep relative overflow-hidden rounded-xl bg-gold px-6 py-3.5 font-semibold text-black transition-colors hover:bg-gold-2">
                 Перейти в каталог
               </Link>
-              <a href="https://wa.me/79180305835" className="rounded-xl border border-border-strong px-6 py-3.5 font-medium text-fg transition-colors hover:border-gold hover:text-gold">
-                Консультация в WhatsApp
+              <a href="tel:+79180305835" className="rounded-xl border border-border-strong px-6 py-3.5 font-medium text-fg transition-colors hover:border-gold hover:text-gold">
+                Позвонить нам
               </a>
             </div>
             <div className="mt-10 flex flex-wrap gap-x-8 gap-y-4">
@@ -56,7 +58,7 @@ export default async function Home() {
                 href={`/catalog/${g.slug}`}
                 className={`surface-card group relative flex flex-col justify-between overflow-hidden rounded-2xl p-5 transition-all hover:-translate-y-1 hover:border-gold/40 ${i === 0 ? "col-span-2" : ""}`}
               >
-                <div className="text-3xl">{g.icon}</div>
+                <CategoryIcon name={g.icon} className="text-4xl text-gold" />
                 <div className="mt-6">
                   <div className="font-display font-semibold group-hover:text-gold">{g.title}</div>
                   <div className="mt-1 text-xs text-fg-muted">{categoriesOfGroup(g.slug).length} категорий</div>
@@ -98,7 +100,7 @@ export default async function Home() {
               href={`/catalog/${g.slug}`}
               className="surface-card group flex flex-col items-center gap-3 rounded-2xl p-5 text-center transition-all hover:-translate-y-1 hover:border-gold/40"
             >
-              <span className="text-3xl transition-transform group-hover:scale-110">{g.icon}</span>
+              <CategoryIcon name={g.icon} className="text-4xl text-gold transition-transform group-hover:scale-110" />
               <span className="text-sm font-medium group-hover:text-gold">{g.title}</span>
             </Link>
           ))}

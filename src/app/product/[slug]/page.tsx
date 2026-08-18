@@ -93,10 +93,10 @@ export default async function ProductPage({
           </div>
 
           <a
-            href={`https://wa.me/79180305835?text=${encodeURIComponent("Здравствуйте! Интересует товар: " + p.title)}`}
+            href="tel:+79180305835"
             className="mt-3 inline-block text-sm text-fg-muted hover:text-gold"
           >
-            Задать вопрос по товару в WhatsApp →
+            Задать вопрос по товару — позвоните нам →
           </a>
 
           {p.description && (

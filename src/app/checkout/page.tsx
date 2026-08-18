@@ -34,7 +34,7 @@ export default function CheckoutPage() {
       clear();
       setDone(true);
     } catch {
-      setError("Не удалось отправить заказ. Попробуйте ещё раз или свяжитесь с нами в WhatsApp.");
+      setError("Не удалось отправить заказ. Попробуйте ещё раз или позвоните нам по телефону.");
     } finally {
       setSending(false);
     }

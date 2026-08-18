@@ -17,7 +17,6 @@ export default function Footer() {
             {[
               ["VK", "https://vk.com/carshinestavropol"],
               ["TG", "https://t.me/carshinestavropol"],
-              ["WA", "https://wa.me/79180305835"],
             ].map(([s, href]) => (
               <a
                 key={s}
@@ -74,9 +73,16 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-border">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-5 text-xs text-fg-dim sm:flex-row">
-          <span>© {new Date().getFullYear()} CarShine · Детейлинг-маркет</span>
-          <span>Ставрополь</span>
+        <div className="mx-auto max-w-7xl px-4 py-5 text-xs text-fg-dim">
+          <p className="mb-2 leading-relaxed">
+            Вся информация на сайте, включая цены и наличие товаров, носит
+            справочный характер и не является публичной офертой, определяемой
+            положениями статьи 437 Гражданского кодекса РФ.
+          </p>
+          <div className="flex flex-col items-center justify-between gap-2 sm:flex-row">
+            <span>© {new Date().getFullYear()} CarShine · Детейлинг-маркет</span>
+            <span>Ставрополь</span>
+          </div>
         </div>
       </div>
     </footer>

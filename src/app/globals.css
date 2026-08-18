@@ -62,6 +62,16 @@ body {
   font-family: var(--font-display), system-ui, sans-serif;
 }
 
+/* Google Material Symbols — иконки категорий */
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  display: inline-block;
+  line-height: 1;
+  vertical-align: middle;
+  -webkit-font-feature-settings: "liga";
+  font-feature-settings: "liga";
+}
+
 /* Gold gradient text */
 .text-gold-gradient {
   background: linear-gradient(100deg, var(--gold-2), var(--gold) 45%, var(--gold-deep));

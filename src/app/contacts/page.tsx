@@ -27,7 +27,6 @@ export default function ContactsPage() {
         </Card>
         <Card title="Мессенджеры">
           <div className="flex gap-3">
-            <a href="https://wa.me/79180305835" className="text-success hover:underline">WhatsApp</a>
             <a href="https://t.me/carshinestavropol" className="text-accent hover:underline">Telegram</a>
             <a href="https://vk.com/carshinestavropol" className="text-fg-muted hover:text-gold">VK</a>
           </div>
@@ -35,10 +34,10 @@ export default function ContactsPage() {
       </div>
 
       <a
-        href="https://wa.me/79180305835"
+        href="tel:+79180305835"
         className="mt-8 inline-block rounded-xl bg-gold px-6 py-3 font-semibold text-black hover:bg-gold-2"
       >
-        Написать в WhatsApp
+        Позвонить нам
       </a>
     </div>
   );

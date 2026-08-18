@@ -12,7 +12,7 @@ export const groups: Group[] = [
   {
     slug: "polirovka",
     title: "Полировка",
-    icon: "✨",
+    icon: "auto_awesome",
     categorySlugs: [
       "abrazivnye-pasty-dlya-lkp",
       "polirovalnye-krugi-i-pady",
@@ -24,7 +24,7 @@ export const groups: Group[] = [
   {
     slug: "moyka-i-uhod",
     title: "Мойка и уход",
-    icon: "🧴",
+    icon: "local_car_wash",
     categorySlugs: [
       "shampuny-ruchnoy-moyki",
       "beskontaktnye-shampuny",
@@ -49,7 +49,7 @@ export const groups: Group[] = [
   {
     slug: "aksessuary",
     title: "Аксессуары",
-    icon: "🧽",
+    icon: "cleaning_services",
     categorySlugs: [
       "protirochnyj-material",
       "sshetki-i-kisti",
@@ -64,7 +64,7 @@ export const groups: Group[] = [
   {
     slug: "oborudovanie",
     title: "Оборудование",
-    icon: "⚙️",
+    icon: "build",
     categorySlugs: [
       "polirovalnye-mashinki",
       "turbosushki-tornadory-ozonatory",
@@ -74,13 +74,13 @@ export const groups: Group[] = [
   {
     slug: "plenka-i-instrumenti",
     title: "Плёнка и инструменты",
-    icon: "🎞️",
+    icon: "layers",
     categorySlugs: ["plenka-i-instrumenti", "sostavy-dlya-plenok"],
   },
   {
     slug: "nabori",
     title: "Наборы",
-    icon: "🎁",
+    icon: "redeem",
     categorySlugs: ["nabori"],
   },
 ];

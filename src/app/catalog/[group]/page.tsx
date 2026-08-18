@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import CatalogView from "@/components/CatalogView";
+import CategoryIcon from "@/components/CategoryIcon";
 import { groups, groupBySlug, categoriesOfGroup } from "@/lib/shop";
 import { productsByGroupLite } from "@/lib/queries";
 
@@ -45,7 +46,7 @@ export default async function GroupPage({
         <Link href="/catalog" className="hover:text-gold">Каталог</Link> / {g.title}
       </nav>
       <div className="flex items-center gap-3">
-        <span className="text-3xl">{g.icon}</span>
+        <CategoryIcon name={g.icon} className="text-4xl text-gold" />
         <div>
           <h1 className="font-display text-3xl font-bold sm:text-4xl">{g.title}</h1>
           <p className="text-fg-muted">{list.length} товаров</p>

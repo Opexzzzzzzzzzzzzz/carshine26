@@ -4,13 +4,10 @@ import Link from "next/link";
 import type { Product } from "@/lib/shop";
 import { formatPrice } from "@/lib/shop";
 import { useCart } from "@/lib/cart";
-import { useFavorites } from "@/lib/favorites";
 import ProductImage from "./ProductImage";
 
 export default function ProductCard({ product }: { product: Product }) {
   const { add } = useCart();
-  const fav = useFavorites();
-  const liked = fav.has(product.slug);
   const snapshot = {
     slug: product.slug,
     title: product.title,
@@ -20,20 +17,6 @@ export default function ProductCard({ product }: { product: Product }) {
 
   return (
     <div className="group surface-card relative flex flex-col overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:border-border-strong hover:shadow-[0_20px_50px_-20px_rgba(0,0,0,0.8)]">
-      <button
-        onClick={() => fav.toggle(snapshot)}
-        className={`absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full backdrop-blur transition-colors ${
-          liked
-            ? "bg-gold/20 text-gold"
-            : "bg-black/20 text-white/70 hover:text-gold"
-        }`}
-        aria-label="В избранное"
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill={liked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.7">
-          <path d="M12 21s-7.5-4.6-10-9.2C.5 8.6 2 5.5 5 5.5c2 0 3.2 1.2 4 2.3.8-1.1 2-2.3 4-2.3 3 0 4.5 3.1 3 6.3C19.5 16.4 12 21 12 21z" strokeLinejoin="round" />
-        </svg>
-      </button>
-
       <Link href={`/product/${product.slug}`} className="block">
         <ProductImage product={product} className="aspect-square w-full" />
       </Link>
