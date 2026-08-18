@@ -16,6 +16,6 @@ echo "===== $(date '+%F %T') : новая версия $REMOTE, деплой ===
 git pull --quiet
 npm install --include=dev --no-audit --no-fund
 npx prisma db push
-npm run build
+NODE_OPTIONS="--max-old-space-size=1536" npm run build
 systemctl restart carshine
 echo "===== $(date '+%F %T') : готово ====="
