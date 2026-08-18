@@ -68,21 +68,28 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, delivered: false });
   }
 
+  // Уведомление в Telegram — best-effort: его сбой НЕ должен ронять заказ,
+  // заявка уже сохранена в БД и видна в админке.
+  let delivered = false;
   try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 8000);
     const tg = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ chat_id: chatId, text: lines, parse_mode: "HTML" }),
+      signal: ctrl.signal,
     });
-    if (!tg.ok) {
+    clearTimeout(t);
+    if (tg.ok) {
+      delivered = true;
+      await prisma.order.update({ where: { id: order.id }, data: { delivered: true } });
+    } else {
       console.error("[ORDER] Telegram error", await tg.text());
-      // Заказ уже сохранён в БД — считаем принятым, доставим уведомление позже.
-      return NextResponse.json({ ok: true, delivered: false, id: order.id });
     }
-    await prisma.order.update({ where: { id: order.id }, data: { delivered: true } });
-    return NextResponse.json({ ok: true, delivered: true, id: order.id });
   } catch (e) {
     console.error("[ORDER] Telegram exception", e);
-    return NextResponse.json({ ok: false, error: "network" }, { status: 502 });
   }
+
+  return NextResponse.json({ ok: true, delivered, id: order.id });
 }
