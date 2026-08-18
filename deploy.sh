@@ -48,7 +48,7 @@ else
 fi
 
 echo "==> [5/8] Зависимости + БД"
-npm ci --include=dev
+npm install --include=dev --no-audit --no-fund
 NEED_SEED=0
 [ -f prisma/dev.db ] || NEED_SEED=1
 npx prisma db push
