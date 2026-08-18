@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getTelegramConfig } from "@/lib/settings";
 
 type Item = { title: string; qty: number; price: number | null; sum: number };
 type OrderPayload = {
@@ -59,8 +60,7 @@ export async function POST(req: Request) {
     .filter(Boolean)
     .join("\n");
 
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
+  const { token, chatId } = await getTelegramConfig();
 
   if (!token || !chatId) {
     // Dev-режим: бота ещё нет — просто логируем, заказ считаем принятым.

@@ -35,6 +35,11 @@ model Product {
   @@index([brand])
 }
 
+model Setting {
+  key   String @id
+  value String @default("")
+}
+
 model Order {
   id        Int      @id @default(autoincrement())
   name      String   @default("")

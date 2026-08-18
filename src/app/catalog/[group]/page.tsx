@@ -53,7 +53,12 @@ export default async function GroupPage({
         </div>
       </div>
       <div className="mt-8">
-        <CatalogView products={list} categories={cats} initialSub={sub} />
+        <CatalogView
+          key={sub ?? "all"}
+          products={list}
+          categories={cats}
+          initialSub={sub}
+        />
       </div>
     </div>
   );
