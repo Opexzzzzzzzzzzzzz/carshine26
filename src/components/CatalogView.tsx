@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Product, Category } from "@/lib/shop";
 import { brandsOf } from "@/lib/shop";
 import ProductCard from "./ProductCard";
@@ -17,7 +17,6 @@ export default function CatalogView({
   categories?: Category[]; // подкатегории (для страницы раздела)
   initialSub?: string;
 }) {
-  const allBrands = useMemo(() => brandsOf(products), [products]);
   const priceCeil = useMemo(
     () => Math.max(1000, ...products.map((p) => p.price ?? 0)),
     [products]
@@ -31,6 +30,17 @@ export default function CatalogView({
   const [maxPrice, setMaxPrice] = useState(0);
   const [limit, setLimit] = useState(PAGE);
   const [brandsOpen, setBrandsOpen] = useState(false);
+
+  // Бренды показываем только те, у которых есть товары в выбранной категории.
+  const availableBrands = useMemo(() => {
+    const base = sub ? products.filter((p) => p.category === sub) : products;
+    return brandsOf(base);
+  }, [products, sub]);
+
+  // Если сменили категорию — снимаем выбранные бренды, которых в ней нет.
+  useEffect(() => {
+    setBrandFilter((prev) => prev.filter((b) => availableBrands.includes(b)));
+  }, [availableBrands]);
 
   const filtered = useMemo(() => {
     let list = products.filter((p) => {
@@ -59,7 +69,7 @@ export default function CatalogView({
     setInStockOnly(false); setMaxPrice(0); setSort("default"); setLimit(PAGE);
   };
 
-  const visibleBrands = brandsOpen ? allBrands : allBrands.slice(0, 8);
+  const visibleBrands = brandsOpen ? availableBrands : availableBrands.slice(0, 8);
 
   return (
     <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
@@ -107,9 +117,9 @@ export default function CatalogView({
               </label>
             ))}
           </div>
-          {allBrands.length > 8 && (
+          {availableBrands.length > 8 && (
             <button onClick={() => setBrandsOpen((v) => !v)} className="mt-3 text-xs text-gold hover:underline">
-              {brandsOpen ? "Свернуть" : `Ещё ${allBrands.length - 8}`}
+              {brandsOpen ? "Свернуть" : `Ещё ${availableBrands.length - 8}`}
             </button>
           )}
         </div>
