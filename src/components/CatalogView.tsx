@@ -73,7 +73,7 @@ export default function CatalogView({
 
   return (
     <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
-      <aside className="h-max space-y-5 lg:sticky lg:top-28">
+      <aside className="scroll-thin space-y-5 lg:sticky lg:top-28 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto lg:pr-1.5">
         <div className="surface-card rounded-2xl p-4">
           <input
             value={query}
