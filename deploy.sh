@@ -32,7 +32,10 @@ cd "$APP_DIR"
 
 echo "==> [4/8] .env"
 if [ ! -f .env ]; then
-  ADMIN_PW="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 16)"
+  set +e +o pipefail
+  ADMIN_PW="$(head -c 24 /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | cut -c1-16)"
+  set -e -o pipefail
+  [ -n "$ADMIN_PW" ] || ADMIN_PW="carshine$(date +%s | cut -c6-)"
   cat > .env <<EOF
 DATABASE_URL="file:./dev.db"
 ADMIN_PASSWORD="$ADMIN_PW"
