@@ -28,12 +28,27 @@ node -v && npm -v
 ```
 
 ## 3. Код проекта на сервер
-Вариант A (рекомендую) — через GitHub: залей репозиторий из `carshine/` в приватный/публичный репозиторий, затем на сервере:
+### Вариант A (рекомендую) — приватный GitHub + deploy-ключ
+
+**3.1. На компьютере (Git Bash в папке проекта):** создай пустой приватный репозиторий на github.com (например `carshine`), затем:
+```bash
+git remote add origin git@github.com:ТВОЙ_ЛОГИН/carshine.git
+git push -u origin main
+```
+
+**3.2. На сервере — read-only ключ для приватного репо:**
+```bash
+ssh-keygen -t ed25519 -C "carshine-vps" -f ~/.ssh/id_ed25519 -N ""
+cat ~/.ssh/id_ed25519.pub
+```
+Скопируй вывод и добавь его в GitHub: репозиторий → **Settings → Deploy keys → Add deploy key** (галку «Allow write» НЕ ставь). Потом:
 ```bash
 mkdir -p /opt && cd /opt
-git clone <URL-репозитория> carshine
+git clone git@github.com:ТВОЙ_ЛОГИН/carshine.git carshine
 cd /opt/carshine
 ```
+
+Обновление потом: `cd /opt/carshine && git pull` (без паролей, ключ уже привязан).
 Вариант B — загрузить напрямую с компьютера (без GitHub), выполнить ЛОКАЛЬНО в папке проекта:
 ```bash
 # из C:\Users\Andrew\Desktop\Спиздили(SNATCH)\carshine
