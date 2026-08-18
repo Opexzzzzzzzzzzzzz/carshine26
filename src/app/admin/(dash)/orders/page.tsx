@@ -27,11 +27,6 @@ export default async function AdminOrders() {
                     <span className="text-xs text-fg-dim">
                       {new Date(o.createdAt).toLocaleString("ru-RU")}
                     </span>
-                    {!o.delivered && (
-                      <span className="rounded-full bg-danger/10 px-2 py-0.5 text-[10px] text-danger ring-1 ring-danger/30">
-                        не ушёл в Telegram
-                      </span>
-                    )}
                   </div>
                   <div className="mt-1 text-sm text-fg-muted">
                     {o.name || "—"} · <a href={`tel:${o.phone}`} className="hover:text-gold">{o.phone}</a>

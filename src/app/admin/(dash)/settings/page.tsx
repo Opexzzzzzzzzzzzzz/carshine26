@@ -32,11 +32,19 @@ export default async function SettingsPage({
   return (
     <div className="max-w-2xl space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-bold">Уведомления в Telegram</h1>
+        <h1 className="font-display text-2xl font-bold">Уведомления</h1>
         <p className="mt-1 text-sm text-fg-muted">
-          Заявки с сайта будут приходить в личный чат. Настраивается здесь — трогать сервер не нужно.
+          Новые заказы звучат и всплывают прямо в этой панели, пока она открыта, и всегда видны в разделе «Заказы».
         </p>
       </div>
+
+      <div className="rounded-lg bg-danger/10 px-4 py-3 text-sm text-danger">
+        Telegram с текущего хостинга заблокирован провайдером — прямая отправка не работает.
+        Блок ниже пригодится, только если позже подключим внешний релей. Основной канал сейчас —
+        уведомления в самой панели (кнопка «🔔 Уведомления» вверху разрешает всплывающие оповещения браузера).
+      </div>
+
+      <h2 className="pt-2 font-display text-lg font-bold text-fg-muted">Telegram (опционально, требует релей)</h2>
 
       <div className="flex items-center gap-2 text-sm">
         <span className={`h-2.5 w-2.5 rounded-full ${configured ? "bg-success" : "bg-fg-dim"}`} />

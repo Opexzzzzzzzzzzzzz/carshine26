@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireAuth } from "@/lib/auth";
 import { logout } from "../auth-actions";
+import OrderNotifier from "@/components/OrderNotifier";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   await requireAuth();
@@ -19,6 +20,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </nav>
         </div>
         <div className="flex items-center gap-3">
+          <OrderNotifier />
           <Link href="/" className="text-sm text-fg-muted hover:text-gold">← На сайт</Link>
           <form action={logout}>
             <button className="rounded-lg border border-border-strong px-3 py-1.5 text-sm text-fg-muted hover:border-danger hover:text-danger">
