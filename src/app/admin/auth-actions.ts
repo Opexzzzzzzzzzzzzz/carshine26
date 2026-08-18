@@ -13,7 +13,9 @@ export async function login(formData: FormData) {
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 24 * 30,
-    secure: process.env.NODE_ENV === "production",
+    // Пока сайт по HTTP — кука без Secure (иначе браузер её не отдаёт).
+    // После подключения SSL выставить COOKIE_SECURE="true" в .env.
+    secure: process.env.COOKIE_SECURE === "true",
   });
   redirect("/admin");
 }
