@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { categories } from "@/lib/shop";
 import { createProduct } from "../../../actions";
+import ImageUpload from "@/components/ImageUpload";
 
 export const dynamic = "force-dynamic";
 
@@ -36,10 +37,10 @@ export default function NewProduct() {
             ))}
           </select>
         </label>
-        <label className="block">
-          <span className="mb-1 block text-xs text-fg-muted">Главное фото (URL)</span>
-          <input name="photo" className={inputCls} />
-        </label>
+        <div>
+          <span className="mb-1 block text-xs text-fg-muted">Главное фото</span>
+          <ImageUpload name="photo" />
+        </div>
         <label className="block">
           <span className="mb-1 block text-xs text-fg-muted">Описание</span>
           <textarea name="description" rows={6} className={inputCls} />

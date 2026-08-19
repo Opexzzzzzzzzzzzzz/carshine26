@@ -53,3 +53,6 @@ verify2.mjs
 /prisma/dev.db-journal
 shots3/
 adminshots.mjs
+
+# загруженные через админку фото (runtime)
+/public/uploads/
