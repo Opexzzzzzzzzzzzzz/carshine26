@@ -111,10 +111,10 @@ export default async function AdminProducts({
                     <form action={toggleStock}>
                       <input type="hidden" name="id" value={it.id} />
                       <button
-                        className={`relative h-6 w-11 rounded-full transition-colors ${it.inStock ? "bg-success" : "bg-border-strong"}`}
+                        className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${it.inStock ? "bg-success" : "bg-border-strong"}`}
                         aria-label="Наличие"
                       >
-                        <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform ${it.inStock ? "translate-x-5" : "translate-x-0.5"}`} />
+                        <span className={`inline-block h-5 w-5 rounded-full bg-white shadow transition-transform ${it.inStock ? "translate-x-[22px]" : "translate-x-0.5"}`} />
                       </button>
                     </form>
                   </td>
