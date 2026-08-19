@@ -90,6 +90,13 @@ server {
     listen 80 default_server;
     server_name $DOMAIN www.$DOMAIN _;
 
+    # Загруженные через админку фото — отдаём напрямую с диска (next start их не отдаёт).
+    location /uploads/ {
+        alias $APP_DIR/public/uploads/;
+        expires 30d;
+        access_log off;
+    }
+
     location / {
         proxy_pass http://127.0.0.1:3000;
         proxy_http_version 1.1;
