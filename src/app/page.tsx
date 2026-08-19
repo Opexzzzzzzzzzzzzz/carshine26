@@ -74,13 +74,13 @@ export default async function Home() {
       <section className="border-b border-border bg-bg-2">
         <div className="mx-auto grid max-w-7xl gap-px px-4 py-2 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            ["🚚", "Доставка по РФ", "Ставрополь и вся Россия"],
-            ["✅", "Только оригинал", "Прямые поставки"],
-            ["🎓", "Подбор и консультации", "Поможем и новичку, и мастеру"],
-            ["🏬", "Самовывоз", "Онежский, 28/3"],
+            ["local_shipping", "Доставка по РФ", "Ставрополь и вся Россия"],
+            ["verified", "Только оригинал", "Прямые поставки"],
+            ["support_agent", "Подбор и консультации", "Поможем и новичку, и мастеру"],
+            ["storefront", "Самовывоз", "Онежский, 28/3"],
           ].map(([icon, title, text]) => (
             <div key={title} className="flex items-start gap-3 py-6">
-              <span className="text-2xl">{icon}</span>
+              <CategoryIcon name={icon} className="text-3xl text-gold" />
               <div>
                 <div className="font-semibold">{title}</div>
                 <div className="text-sm text-fg-muted">{text}</div>
