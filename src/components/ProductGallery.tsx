@@ -30,6 +30,7 @@ export default function ProductGallery({
           fill
           sizes="(max-width: 1024px) 100vw, 50vw"
           priority
+          unoptimized={list[active].startsWith("/")}
           className="object-contain p-6"
         />
       </div>
@@ -43,7 +44,7 @@ export default function ProductGallery({
                 i === active ? "ring-2 ring-gold" : "opacity-70 hover:opacity-100"
               }`}
             >
-              <Image src={src} alt="" fill sizes="80px" className="object-contain p-1.5" />
+              <Image src={src} alt="" fill sizes="80px" unoptimized={src.startsWith("/")} className="object-contain p-1.5" />
             </button>
           ))}
         </div>

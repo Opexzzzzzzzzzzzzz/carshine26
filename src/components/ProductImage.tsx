@@ -27,6 +27,7 @@ export default function ProductImage({
   priority?: boolean;
 }) {
   if (product.photo) {
+    const isLocal = product.photo.startsWith("/"); // загруженные с компа фото
     return (
       <div className={`relative overflow-hidden bg-[#f4f4f2] ${className}`}>
         <Image
@@ -35,6 +36,7 @@ export default function ProductImage({
           fill
           sizes={sizes}
           priority={priority}
+          unoptimized={isLocal}
           className="object-contain p-3"
         />
       </div>
