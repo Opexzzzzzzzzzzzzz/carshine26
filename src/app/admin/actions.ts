@@ -9,7 +9,9 @@ function toPrice(v: FormDataEntryValue | null): number | null {
   const s = String(v ?? "").replace(/\s/g, "").replace(",", ".");
   if (!s) return null;
   const n = Math.round(Number(s));
-  return Number.isFinite(n) ? n : null;
+  if (!Number.isFinite(n)) return null;
+  // Не выходить за пределы INT-колонки (иначе чтение из БД падает). Макс 2 млрд.
+  return Math.min(Math.max(0, n), 2_000_000_000);
 }
 
 export async function updateProduct(formData: FormData) {
