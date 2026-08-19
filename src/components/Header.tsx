@@ -43,9 +43,10 @@ export default function Header() {
           <BurgerIcon />
         </button>
 
-        <Link href="/" className="flex shrink-0 items-center" aria-label="CarShine — на главную">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="CarShine" className="h-8 w-auto sm:h-9" />
+        <Link href="/" className="flex items-center gap-2 shrink-0">
+          <span className="font-display text-xl font-bold tracking-tight">
+            Car<span className="text-gold-gradient">Shine</span>
+          </span>
         </Link>
 
         <nav className="ml-2 hidden items-center gap-0.5 lg:flex">
