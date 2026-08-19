@@ -10,18 +10,20 @@ const PER = 30;
 export default async function AdminProducts({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; page?: string; saved?: string; deleted?: string }>;
+  searchParams: Promise<{ q?: string; page?: string; saved?: string; deleted?: string; sort?: string }>;
 }) {
-  const { q = "", page = "1", saved, deleted } = await searchParams;
+  const { q = "", page = "1", saved, deleted, sort = "title" } = await searchParams;
   const p = Math.max(1, Number(page) || 1);
   const where: Prisma.ProductWhereInput = q
     ? { OR: [{ title: { contains: q } }, { brand: { contains: q } }] }
     : {};
+  const orderBy: Prisma.ProductOrderByWithRelationInput =
+    sort === "new" ? { createdAt: "desc" } : { title: "asc" };
 
   const [items, total] = await Promise.all([
     prisma.product.findMany({
       where,
-      orderBy: { title: "asc" },
+      orderBy,
       skip: (p - 1) * PER,
       take: PER,
       select: { id: true, slug: true, title: true, brand: true, price: true, photo: true, inStock: true },
@@ -45,15 +47,40 @@ export default async function AdminProducts({
         </div>
       )}
 
-      <form className="flex gap-2">
-        <input
-          name="q"
-          defaultValue={q}
-          placeholder="Поиск по названию или бренду…"
-          className="w-full max-w-md rounded-lg border border-border-strong bg-surface px-3 py-2 text-sm outline-none focus:border-gold"
-        />
-        <button className="rounded-lg border border-border-strong px-4 py-2 text-sm hover:border-gold hover:text-gold">Найти</button>
-      </form>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <form className="flex gap-2">
+          <input type="hidden" name="sort" value={sort} />
+          <input
+            name="q"
+            defaultValue={q}
+            placeholder="Поиск по названию или бренду…"
+            className="w-72 max-w-full rounded-lg border border-border-strong bg-surface px-3 py-2 text-sm outline-none focus:border-gold"
+          />
+          <button className="rounded-lg border border-border-strong px-4 py-2 text-sm hover:border-gold hover:text-gold">Найти</button>
+        </form>
+
+        <div className="flex items-center gap-1 text-sm">
+          <span className="mr-1 text-xs text-fg-dim">Сортировка:</span>
+          {[
+            ["title", "По названию"],
+            ["new", "Сначала новые"],
+          ].map(([s, label]) => {
+            const params = new URLSearchParams();
+            if (q) params.set("q", q);
+            if (s !== "title") params.set("sort", s);
+            const qs = params.toString();
+            return (
+              <Link
+                key={s}
+                href={`/admin/products${qs ? `?${qs}` : ""}`}
+                className={`rounded-lg px-3 py-1.5 ${sort === s ? "bg-gold text-black" : "border border-border-strong text-fg-muted hover:text-gold"}`}
+              >
+                {label}
+              </Link>
+            );
+          })}
+        </div>
+      </div>
 
       <div className="surface-card overflow-hidden rounded-2xl">
         <div className="scroll-thin overflow-x-auto">
@@ -107,6 +134,7 @@ export default async function AdminProducts({
             const n = i + 1;
             const params = new URLSearchParams();
             if (q) params.set("q", q);
+            if (sort !== "title") params.set("sort", sort);
             params.set("page", String(n));
             return (
               <Link
