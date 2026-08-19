@@ -3,6 +3,7 @@ import { groups, allBrands, totalProducts, categoriesOfGroup, plural } from "@/l
 import { featuredProductsLite } from "@/lib/queries";
 import ProductCard from "@/components/ProductCard";
 import CategoryIcon from "@/components/CategoryIcon";
+import NewSiteNotice from "@/components/NewSiteNotice";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,8 @@ export default async function Home() {
 
   return (
     <>
+      <NewSiteNotice />
+
       {/* HERO */}
       <section className="relative overflow-hidden border-b border-border">
         <div className="hero-glow absolute inset-0" />
