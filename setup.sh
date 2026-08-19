@@ -13,7 +13,7 @@ apt-get install -y cron >/dev/null 2>&1 || true
 systemctl enable --now cron >/dev/null 2>&1 || true
 chmod +x autodeploy.sh
 ( crontab -l 2>/dev/null | grep -v autodeploy; \
-  echo "*/2 * * * * flock -n /tmp/cs.lock /opt/carshine/autodeploy.sh >> /var/log/carshine-deploy.log 2>&1" ) | crontab -
+  echo "*/2 * * * * flock -n /tmp/cs.lock bash /opt/carshine/autodeploy.sh >> /var/log/carshine-deploy.log 2>&1" ) | crontab -
 
 echo "======================================================"
 echo " ГОТОВО. Автодеплой включён."
