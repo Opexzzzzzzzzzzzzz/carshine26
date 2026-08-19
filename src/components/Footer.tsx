@@ -67,7 +67,16 @@ export default function Footer() {
             <li><a href="tel:+79180305835" className="hover:text-gold">+7 918 030-58-35</a></li>
             <li><a href="tel:+79288242991" className="hover:text-gold">+7 928 824-29-91</a></li>
             <li><a href="mailto:carshinestavropol@gmail.com" className="hover:text-gold">carshinestavropol@gmail.com</a></li>
-            <li>Ставрополь, пер. Онежский, 28/3</li>
+            <li>
+              <a
+                href="https://yandex.ru/maps/-/CHsiYQ5o"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-gold"
+              >
+                Ставрополь, пер. Онежский, 28/3
+              </a>
+            </li>
           </ul>
         </div>
       </div>
