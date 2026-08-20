@@ -48,10 +48,10 @@ export default function Header() {
           <Image
             src="/logo.png"
             alt="CarShine"
-            width={1000}
-            height={1000}
+            width={773}
+            height={258}
             priority
-            className="h-9 w-auto sm:h-10"
+            className="h-8 w-auto sm:h-9"
           />
         </Link>
 
