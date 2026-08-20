@@ -1,0 +1,146 @@
+"use client";
+
+import { useState } from "react";
+import { updateOrder } from "@/app/admin/actions";
+import { formatPrice } from "@/lib/shop";
+
+type Item = { title: string; qty: number; price: number | null; sum: number };
+type Order = {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  promo: string;
+  status: string;
+  items: Item[];
+};
+
+const inputCls =
+  "w-full rounded-lg border border-border-strong bg-bg px-3 py-2.5 text-sm outline-none focus:border-gold";
+
+export default function OrderEditor({ order }: { order: Order }) {
+  const [items, setItems] = useState<Item[]>(order.items);
+
+  const setField = (i: number, patch: Partial<Item>) =>
+    setItems((prev) =>
+      prev.map((it, idx) => {
+        if (idx !== i) return it;
+        const next = { ...it, ...patch };
+        next.sum = (next.price ?? 0) * next.qty;
+        return next;
+      })
+    );
+
+  const removeAt = (i: number) => setItems((prev) => prev.filter((_, idx) => idx !== i));
+  const addRow = () =>
+    setItems((prev) => [...prev, { title: "", qty: 1, price: 0, sum: 0 }]);
+
+  const clean = items
+    .map((it) => ({ ...it, title: it.title.trim() }))
+    .filter((it) => it.title);
+  const total = clean.reduce((s, it) => s + it.sum, 0);
+
+  return (
+    <form action={updateOrder} className="surface-card space-y-5 rounded-2xl p-6">
+      <input type="hidden" name="id" value={order.id} />
+      <input type="hidden" name="items" value={JSON.stringify(clean)} />
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label className="block">
+          <span className="mb-1 block text-xs text-fg-muted">Имя</span>
+          <input name="name" defaultValue={order.name} className={inputCls} />
+        </label>
+        <label className="block">
+          <span className="mb-1 block text-xs text-fg-muted">Телефон</span>
+          <input name="phone" defaultValue={order.phone} className={inputCls} />
+        </label>
+        <label className="block">
+          <span className="mb-1 block text-xs text-fg-muted">Email</span>
+          <input name="email" defaultValue={order.email} className={inputCls} />
+        </label>
+        <label className="block">
+          <span className="mb-1 block text-xs text-fg-muted">Промокод</span>
+          <input name="promo" defaultValue={order.promo} className={inputCls} />
+        </label>
+        <label className="block">
+          <span className="mb-1 block text-xs text-fg-muted">Статус</span>
+          <select name="status" defaultValue={order.status} className={inputCls}>
+            <option value="new">Новый</option>
+            <option value="processing">В работе</option>
+            <option value="done">Выполнен</option>
+            <option value="canceled">Отменён</option>
+          </select>
+        </label>
+      </div>
+
+      <div>
+        <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-fg-dim">
+          Состав заказа
+        </div>
+        <div className="space-y-2">
+          {items.map((it, i) => (
+            <div key={i} className="flex flex-wrap items-end gap-2 rounded-xl border border-border p-3 sm:flex-nowrap">
+              <label className="min-w-0 flex-1">
+                <span className="mb-1 block text-[11px] text-fg-dim">Товар</span>
+                <input
+                  value={it.title}
+                  onChange={(e) => setField(i, { title: e.target.value })}
+                  className={inputCls}
+                />
+              </label>
+              <label className="w-20 shrink-0">
+                <span className="mb-1 block text-[11px] text-fg-dim">Кол-во</span>
+                <input
+                  inputMode="numeric"
+                  value={it.qty}
+                  onChange={(e) => setField(i, { qty: Math.max(1, Math.round(Number(e.target.value) || 1)) })}
+                  className={inputCls}
+                />
+              </label>
+              <label className="w-28 shrink-0">
+                <span className="mb-1 block text-[11px] text-fg-dim">Цена, ₽</span>
+                <input
+                  inputMode="numeric"
+                  value={it.price ?? ""}
+                  placeholder="—"
+                  onChange={(e) => {
+                    const v = e.target.value.trim();
+                    setField(i, { price: v === "" ? null : Math.max(0, Math.round(Number(v) || 0)) });
+                  }}
+                  className={inputCls}
+                />
+              </label>
+              <div className="w-28 shrink-0 pb-2.5 text-right text-sm text-fg-muted">
+                {formatPrice(it.sum)}
+              </div>
+              <button
+                type="button"
+                onClick={() => removeAt(i)}
+                title="Убрать позицию"
+                className="shrink-0 rounded-lg border border-danger/40 px-2.5 py-2 text-xs text-danger hover:bg-danger/10"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={addRow}
+          className="mt-3 rounded-lg border border-border-strong px-3 py-2 text-sm text-fg-muted hover:border-gold hover:text-gold"
+        >
+          + добавить позицию
+        </button>
+      </div>
+
+      <div className="flex items-center justify-between border-t border-border pt-4">
+        <span className="text-sm text-fg-muted">Итого (пересчитывается автоматически)</span>
+        <span className="font-display text-xl font-bold">{formatPrice(total)}</span>
+      </div>
+
+      <button className="rounded-xl bg-gold px-6 py-3 font-semibold text-black hover:bg-gold-2">
+        Сохранить изменения
+      </button>
+    </form>
+  );
+}

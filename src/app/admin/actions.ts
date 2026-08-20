@@ -102,3 +102,48 @@ export async function deleteOrder(formData: FormData) {
   revalidatePath("/admin/orders");
   revalidatePath("/admin");
 }
+
+type OrderItem = { title: string; qty: number; price: number | null; sum: number };
+
+export async function updateOrder(formData: FormData) {
+  await requireAuth();
+  const id = Number(formData.get("id"));
+
+  // Позиции приходят JSON-массивом из редактора; чистим и пересчитываем суммы.
+  let items: OrderItem[] = [];
+  try {
+    const parsed = JSON.parse(String(formData.get("items") || "[]"));
+    if (Array.isArray(parsed)) {
+      items = parsed
+        .map((it): OrderItem => {
+          const title = String(it.title ?? "").trim();
+          const qty = Math.max(1, Math.round(Number(it.qty) || 1));
+          const priceRaw = it.price;
+          const price =
+            priceRaw === null || priceRaw === "" || priceRaw === undefined
+              ? null
+              : Math.max(0, Math.round(Number(priceRaw) || 0));
+          return { title, qty, price, sum: (price ?? 0) * qty };
+        })
+        .filter((it) => it.title);
+    }
+  } catch {}
+
+  const total = items.reduce((s, it) => s + it.sum, 0);
+
+  await prisma.order.update({
+    where: { id },
+    data: {
+      name: String(formData.get("name") || "").trim(),
+      email: String(formData.get("email") || "").trim(),
+      phone: String(formData.get("phone") || "").trim(),
+      promo: String(formData.get("promo") || "").trim(),
+      status: String(formData.get("status") || "new"),
+      itemsJson: JSON.stringify(items),
+      total,
+    },
+  });
+  revalidatePath("/admin/orders");
+  revalidatePath("/admin");
+  redirect("/admin/orders?saved=1");
+}

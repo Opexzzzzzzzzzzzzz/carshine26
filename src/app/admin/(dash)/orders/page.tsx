@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { formatPrice } from "@/lib/shop";
 import { setOrderStatus } from "../../actions";
@@ -51,6 +52,12 @@ export default async function AdminOrders() {
                     </select>
                     <button className="rounded-lg bg-surface-2 px-2.5 py-1.5 text-xs text-fg-muted hover:text-gold">OK</button>
                   </form>
+                  <Link
+                    href={`/admin/orders/${o.id}`}
+                    className="rounded-lg border border-border-strong px-2.5 py-1.5 text-xs text-fg-muted hover:border-gold hover:text-gold"
+                  >
+                    Редактировать
+                  </Link>
                   <DeleteOrderButton id={o.id} />
                 </div>
               </div>
