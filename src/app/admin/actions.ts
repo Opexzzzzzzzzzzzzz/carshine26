@@ -93,6 +93,7 @@ export async function setOrderStatus(formData: FormData) {
   await prisma.order.update({ where: { id }, data: { status } });
   revalidatePath("/admin/orders");
   revalidatePath("/admin");
+  redirect("/admin/orders?saved=1");
 }
 
 export async function deleteOrder(formData: FormData) {
@@ -101,6 +102,7 @@ export async function deleteOrder(formData: FormData) {
   await prisma.order.delete({ where: { id } });
   revalidatePath("/admin/orders");
   revalidatePath("/admin");
+  redirect("/admin/orders?deleted=1");
 }
 
 type OrderItem = { title: string; qty: number; price: number | null; sum: number };

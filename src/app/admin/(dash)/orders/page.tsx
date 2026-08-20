@@ -8,12 +8,19 @@ export const dynamic = "force-dynamic";
 
 type Item = { title: string; qty: number; price: number | null; sum: number };
 
-export default async function AdminOrders() {
+export default async function AdminOrders({
+  searchParams,
+}: {
+  searchParams: Promise<{ saved?: string; deleted?: string }>;
+}) {
+  const { saved, deleted } = await searchParams;
   const orders = await prisma.order.findMany({ orderBy: { createdAt: "desc" }, take: 200 });
 
   return (
     <div className="space-y-4">
       <h1 className="font-display text-2xl font-bold">Заказы</h1>
+      {saved && <div className="rounded-lg bg-success/10 px-4 py-2 text-sm text-success">Статус сохранён</div>}
+      {deleted && <div className="rounded-lg bg-success/10 px-4 py-2 text-sm text-success">Заказ удалён</div>}
       {orders.length === 0 ? (
         <div className="surface-card rounded-2xl p-10 text-center text-fg-muted">Заказов пока нет</div>
       ) : (
