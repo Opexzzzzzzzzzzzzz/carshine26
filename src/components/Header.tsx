@@ -46,7 +46,7 @@ export default function Header() {
 
         <Link href="/" className="flex items-center shrink-0" aria-label="CarShine — на главную">
           <Image
-            src="/photo_2026-08-20_12-52-20.jpg"
+            src="/logo.png"
             alt="CarShine"
             width={773}
             height={258}
