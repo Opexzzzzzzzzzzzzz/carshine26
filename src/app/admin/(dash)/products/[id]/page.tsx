@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { categories } from "@/lib/shop";
+import { distinctBrands } from "@/lib/queries";
 import { updateProduct, deleteProduct } from "../../../actions";
 import ProductPhotos from "@/components/ProductPhotos";
 
@@ -18,6 +19,8 @@ export default async function EditProduct({
   const { created } = await searchParams;
   const p = await prisma.product.findUnique({ where: { id } });
   if (!p) notFound();
+
+  const brands = await distinctBrands();
 
   let photos: string[] = [];
   try {
@@ -44,7 +47,10 @@ export default async function EditProduct({
 
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Бренд">
-            <input name="brand" defaultValue={p.brand} className={inputCls} />
+            <input name="brand" defaultValue={p.brand} list="brands-list" autoComplete="off" placeholder="Начните вводить…" className={inputCls} />
+            <datalist id="brands-list">
+              {brands.map((b) => <option key={b} value={b} />)}
+            </datalist>
           </Field>
           <Field label="Цена, ₽ (пусто = по запросу)">
             <input name="price" defaultValue={p.price ?? ""} inputMode="numeric" className={inputCls} />

@@ -69,6 +69,17 @@ export async function allProductsLite(): Promise<Product[]> {
   return rows.map(liteToProduct);
 }
 
+// Актуальный список брендов из БД (для автоподсказок в админке).
+export async function distinctBrands(): Promise<string[]> {
+  const rows = await prisma.product.findMany({
+    where: { brand: { not: "" } },
+    distinct: ["brand"],
+    select: { brand: true },
+    orderBy: { brand: "asc" },
+  });
+  return rows.map((r) => r.brand);
+}
+
 export async function productsByGroupLite(groupSlug: string): Promise<Product[]> {
   const g = groupBySlug(groupSlug);
   if (!g) return [];
