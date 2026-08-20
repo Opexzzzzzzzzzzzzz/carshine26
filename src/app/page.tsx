@@ -80,7 +80,7 @@ export default async function Home() {
             ["local_shipping", "Доставка по РФ", "Ставрополь и вся Россия"],
             ["verified", "Только оригинал", "Прямые поставки"],
             ["support_agent", "Подбор и консультации", "Поможем и новичку, и мастеру"],
-            ["storefront", "Самовывоз", "Онежский, 28/3"],
+            ["storefront", "Самовывоз", "Ставрополь, пер. Онежский, 28/3"],
           ].map(([icon, title, text]) => (
             <div key={title} className="flex items-start gap-3 py-6">
               <CategoryIcon name={icon} className="text-3xl text-gold" />
