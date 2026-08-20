@@ -69,6 +69,14 @@ export async function allProductsLite(): Promise<Product[]> {
   return rows.map(liteToProduct);
 }
 
+// Названия товаров + цены (для автоподсказок в редакторе заказа).
+export async function productTitlesForPicker(): Promise<{ title: string; price: number | null }[]> {
+  return prisma.product.findMany({
+    select: { title: true, price: true },
+    orderBy: { title: "asc" },
+  });
+}
+
 // Актуальный список брендов из БД (для автоподсказок в админке).
 export async function distinctBrands(): Promise<string[]> {
   const rows = await prisma.product.findMany({

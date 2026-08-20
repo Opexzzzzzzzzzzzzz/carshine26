@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
+import { productTitlesForPicker } from "@/lib/queries";
 import OrderEditor from "@/components/OrderEditor";
 
 export const dynamic = "force-dynamic";
@@ -22,6 +23,8 @@ export default async function EditOrder({
     if (Array.isArray(parsed)) items = parsed;
   } catch {}
 
+  const catalog = await productTitlesForPicker();
+
   return (
     <div className="max-w-3xl space-y-5">
       <Link href="/admin/orders" className="text-sm text-fg-muted hover:text-gold">← К заказам</Link>
@@ -42,6 +45,7 @@ export default async function EditOrder({
           status: o.status,
           items,
         }}
+        catalog={catalog}
       />
     </div>
   );

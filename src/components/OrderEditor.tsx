@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { updateOrder } from "@/app/admin/actions";
 import { formatPrice } from "@/lib/shop";
 
 type Item = { title: string; qty: number; price: number | null; sum: number };
+type CatalogItem = { title: string; price: number | null };
 type Order = {
   id: number;
   name: string;
@@ -18,14 +19,31 @@ type Order = {
 const inputCls =
   "w-full rounded-lg border border-border-strong bg-bg px-3 py-2.5 text-sm outline-none focus:border-gold";
 
-export default function OrderEditor({ order }: { order: Order }) {
+export default function OrderEditor({
+  order,
+  catalog = [],
+}: {
+  order: Order;
+  catalog?: CatalogItem[];
+}) {
   const [items, setItems] = useState<Item[]>(order.items);
+
+  // Карта «точное название → цена» для автоподстановки цены при выборе товара.
+  const priceByTitle = useMemo(() => {
+    const m = new Map<string, number | null>();
+    for (const c of catalog) m.set(c.title, c.price);
+    return m;
+  }, [catalog]);
 
   const setField = (i: number, patch: Partial<Item>) =>
     setItems((prev) =>
       prev.map((it, idx) => {
         if (idx !== i) return it;
         const next = { ...it, ...patch };
+        // При точном совпадении названия с товаром из каталога — подставляем цену.
+        if ("title" in patch && priceByTitle.has(next.title)) {
+          next.price = priceByTitle.get(next.title) ?? null;
+        }
         next.sum = (next.price ?? 0) * next.qty;
         return next;
       })
@@ -44,6 +62,12 @@ export default function OrderEditor({ order }: { order: Order }) {
     <form action={updateOrder} className="surface-card space-y-5 rounded-2xl p-6">
       <input type="hidden" name="id" value={order.id} />
       <input type="hidden" name="items" value={JSON.stringify(clean)} />
+
+      {priceByTitle.size > 0 && (
+        <datalist id="order-catalog">
+          {Array.from(priceByTitle.keys()).map((t) => <option key={t} value={t} />)}
+        </datalist>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block">
@@ -84,6 +108,8 @@ export default function OrderEditor({ order }: { order: Order }) {
                 <span className="mb-1 block text-[11px] text-fg-dim">Товар</span>
                 <input
                   value={it.title}
+                  list="order-catalog"
+                  autoComplete="off"
                   onChange={(e) => setField(i, { title: e.target.value })}
                   className={inputCls}
                 />
