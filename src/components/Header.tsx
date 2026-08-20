@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { groups, categoriesOfGroup } from "@/lib/shop";
@@ -43,10 +44,15 @@ export default function Header() {
           <BurgerIcon />
         </button>
 
-        <Link href="/" className="flex items-center gap-2 shrink-0">
-          <span className="font-display text-xl font-bold tracking-tight">
-            Car<span className="text-gold-gradient">Shine</span>
-          </span>
+        <Link href="/" className="flex items-center shrink-0" aria-label="CarShine — на главную">
+          <Image
+            src="/photo_2026-08-20_12-52-20.jpg"
+            alt="CarShine"
+            width={773}
+            height={258}
+            priority
+            className="h-8 w-auto sm:h-9"
+          />
         </Link>
 
         <nav className="ml-2 hidden items-center gap-0.5 lg:flex">
