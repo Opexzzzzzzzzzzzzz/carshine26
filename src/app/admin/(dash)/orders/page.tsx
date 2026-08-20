@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { formatPrice } from "@/lib/shop";
 import { setOrderStatus } from "../../actions";
+import DeleteOrderButton from "@/components/DeleteOrderButton";
 
 export const dynamic = "force-dynamic";
 
@@ -50,6 +51,7 @@ export default async function AdminOrders() {
                     </select>
                     <button className="rounded-lg bg-surface-2 px-2.5 py-1.5 text-xs text-fg-muted hover:text-gold">OK</button>
                   </form>
+                  <DeleteOrderButton id={o.id} />
                 </div>
               </div>
               <div className="mt-3 border-t border-border pt-3">

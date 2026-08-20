@@ -94,3 +94,11 @@ export async function setOrderStatus(formData: FormData) {
   revalidatePath("/admin/orders");
   revalidatePath("/admin");
 }
+
+export async function deleteOrder(formData: FormData) {
+  await requireAuth();
+  const id = Number(formData.get("id"));
+  await prisma.order.delete({ where: { id } });
+  revalidatePath("/admin/orders");
+  revalidatePath("/admin");
+}
