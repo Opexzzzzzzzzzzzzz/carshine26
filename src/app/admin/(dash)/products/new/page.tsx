@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { categories } from "@/lib/shop";
 import { createProduct } from "../../../actions";
-import ImageUpload from "@/components/ImageUpload";
+import ProductPhotos from "@/components/ProductPhotos";
 
 export const dynamic = "force-dynamic";
 
@@ -38,8 +38,8 @@ export default function NewProduct() {
           </select>
         </label>
         <div>
-          <span className="mb-1 block text-xs text-fg-muted">Главное фото</span>
-          <ImageUpload name="photo" />
+          <span className="mb-1 block text-xs text-fg-muted">Фото товара</span>
+          <ProductPhotos name="photos" />
         </div>
         <label className="block">
           <span className="mb-1 block text-xs text-fg-muted">Описание</span>

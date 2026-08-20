@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { categories } from "@/lib/shop";
 import { updateProduct, deleteProduct } from "../../../actions";
-import ImageUpload from "@/components/ImageUpload";
+import ProductPhotos from "@/components/ProductPhotos";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +18,13 @@ export default async function EditProduct({
   const { created } = await searchParams;
   const p = await prisma.product.findUnique({ where: { id } });
   if (!p) notFound();
+
+  let photos: string[] = [];
+  try {
+    const parsed = JSON.parse(p.photosJson);
+    if (Array.isArray(parsed)) photos = parsed.map(String).filter(Boolean);
+  } catch {}
+  if (!photos.length && p.photo) photos = [p.photo];
 
   return (
     <div className="max-w-3xl space-y-5">
@@ -52,8 +59,8 @@ export default async function EditProduct({
           </select>
         </Field>
 
-        <Field label="Главное фото">
-          <ImageUpload name="photo" defaultValue={p.photo} />
+        <Field label="Фото товара">
+          <ProductPhotos name="photos" defaultValue={photos} />
         </Field>
 
         <Field label="Описание">

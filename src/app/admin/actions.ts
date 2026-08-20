@@ -14,10 +14,21 @@ function toPrice(v: FormDataEntryValue | null): number | null {
   return Math.min(Math.max(0, n), 2_000_000_000);
 }
 
+// Массив фото из формы (скрытое поле `photos` — JSON-массив URL).
+// Возвращает главное фото (первое) и JSON всего массива.
+function readPhotos(formData: FormData): { photo: string; photosJson: string } {
+  let list: string[] = [];
+  try {
+    const parsed = JSON.parse(String(formData.get("photos") || "[]"));
+    if (Array.isArray(parsed)) list = parsed.map((x) => String(x).trim()).filter(Boolean);
+  } catch {}
+  return { photo: list[0] || "", photosJson: JSON.stringify(list) };
+}
+
 export async function updateProduct(formData: FormData) {
   await requireAuth();
   const id = String(formData.get("id"));
-  const photo = String(formData.get("photo") || "");
+  const { photo, photosJson } = readPhotos(formData);
   await prisma.product.update({
     where: { id },
     data: {
@@ -27,7 +38,7 @@ export async function updateProduct(formData: FormData) {
       categorySlug: String(formData.get("categorySlug") || ""),
       description: String(formData.get("description") || "").trim(),
       photo,
-      photosJson: photo ? JSON.stringify([photo]) : "[]",
+      photosJson,
       inStock: formData.get("inStock") === "on",
     },
   });
@@ -56,7 +67,7 @@ export async function deleteProduct(formData: FormData) {
 export async function createProduct(formData: FormData) {
   await requireAuth();
   const id = "m" + Date.now().toString(36);
-  const photo = String(formData.get("photo") || "");
+  const { photo, photosJson } = readPhotos(formData);
   await prisma.product.create({
     data: {
       id,
@@ -67,7 +78,7 @@ export async function createProduct(formData: FormData) {
       categorySlug: String(formData.get("categorySlug") || "prochee"),
       description: String(formData.get("description") || "").trim(),
       photo,
-      photosJson: photo ? JSON.stringify([photo]) : "[]",
+      photosJson,
       inStock: formData.get("inStock") === "on",
     },
   });
