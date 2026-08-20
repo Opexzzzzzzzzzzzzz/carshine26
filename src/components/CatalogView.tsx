@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 import type { Product, Category } from "@/lib/shop";
 import { brandsOf } from "@/lib/shop";
 import ProductCard from "./ProductCard";
@@ -17,19 +18,42 @@ export default function CatalogView({
   categories?: Category[]; // подкатегории (для страницы раздела)
   initialSub?: string;
 }) {
+  const pathname = usePathname();
+  const sp = useSearchParams();
+
   const priceCeil = useMemo(
     () => Math.max(1000, ...products.map((p) => p.price ?? 0)),
     [products]
   );
 
-  const [query, setQuery] = useState("");
-  const [brandFilter, setBrandFilter] = useState<string[]>([]);
-  const [sub, setSub] = useState<string | null>(initialSub ?? null);
-  const [inStockOnly, setInStockOnly] = useState(false);
-  const [sort, setSort] = useState<Sort>("default");
-  const [maxPrice, setMaxPrice] = useState(0);
-  const [limit, setLimit] = useState(PAGE);
+  // Начальное состояние читаем из URL (консистентно с SSR) — чтобы кнопка
+  // «назад» восстанавливала фильтры, сортировку, страницу и позицию скролла.
+  const [query, setQuery] = useState(() => sp.get("q") ?? "");
+  const [brandFilter, setBrandFilter] = useState<string[]>(() => {
+    const b = sp.get("brand");
+    return b ? b.split(",").filter(Boolean) : [];
+  });
+  const [sub, setSub] = useState<string | null>(() => sp.get("sub") ?? initialSub ?? null);
+  const [inStockOnly, setInStockOnly] = useState(() => sp.get("stock") === "1");
+  const [sort, setSort] = useState<Sort>(() => (sp.get("sort") as Sort) || "default");
+  const [maxPrice, setMaxPrice] = useState(() => Number(sp.get("max")) || 0);
+  const [limit, setLimit] = useState(() => Number(sp.get("show")) || PAGE);
   const [brandsOpen, setBrandsOpen] = useState(false);
+
+  // Отражаем состояние в URL без записи в историю и без перезагрузки RSC.
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (sub) params.set("sub", sub);
+    if (query) params.set("q", query);
+    if (brandFilter.length) params.set("brand", brandFilter.join(","));
+    if (sort !== "default") params.set("sort", sort);
+    if (maxPrice) params.set("max", String(maxPrice));
+    if (inStockOnly) params.set("stock", "1");
+    if (limit !== PAGE) params.set("show", String(limit));
+    const qs = params.toString();
+    const url = qs ? `${pathname}?${qs}` : pathname;
+    window.history.replaceState(window.history.state, "", url);
+  }, [pathname, sub, query, brandFilter, sort, maxPrice, inStockOnly, limit]);
 
   // Бренды показываем только те, у которых есть товары в выбранной категории.
   const availableBrands = useMemo(() => {

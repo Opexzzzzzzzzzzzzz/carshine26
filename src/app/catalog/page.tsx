@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import CatalogView from "@/components/CatalogView";
 import { totalProducts } from "@/lib/shop";
 import { allProductsLite } from "@/lib/queries";
@@ -22,7 +23,9 @@ export default async function CatalogPage() {
         фильтры, чтобы быстро найти нужное.
       </p>
       <div className="mt-8">
-        <CatalogView products={list} />
+        <Suspense fallback={null}>
+          <CatalogView products={list} />
+        </Suspense>
       </div>
     </div>
   );

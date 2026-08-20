@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import CatalogView from "@/components/CatalogView";
@@ -53,12 +54,14 @@ export default async function GroupPage({
         </div>
       </div>
       <div className="mt-8">
-        <CatalogView
-          key={sub ?? "all"}
-          products={list}
-          categories={cats}
-          initialSub={sub}
-        />
+        <Suspense fallback={null}>
+          <CatalogView
+            key={sub ?? "all"}
+            products={list}
+            categories={cats}
+            initialSub={sub}
+          />
+        </Suspense>
       </div>
     </div>
   );
