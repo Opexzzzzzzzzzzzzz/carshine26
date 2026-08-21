@@ -54,7 +54,11 @@ export default function OrderEditor({
     setItems((prev) => [...prev, { title: "", qty: 1, price: 0, sum: 0 }]);
 
   const clean = items
-    .map((it) => ({ ...it, title: it.title.trim() }))
+    .map((it) => {
+      // Пустое кол-во (после очистки поля) при сохранении считаем за 1.
+      const qty = it.qty < 1 ? 1 : it.qty;
+      return { ...it, title: it.title.trim(), qty, sum: (it.price ?? 0) * qty };
+    })
     .filter((it) => it.title);
   const total = clean.reduce((s, it) => s + it.sum, 0);
 
@@ -114,15 +118,41 @@ export default function OrderEditor({
                   className={inputCls}
                 />
               </label>
-              <label className="w-20 shrink-0">
+              <div className="w-24 shrink-0">
                 <span className="mb-1 block text-[11px] text-fg-dim">Кол-во</span>
-                <input
-                  inputMode="numeric"
-                  value={it.qty}
-                  onChange={(e) => setField(i, { qty: Math.max(1, Math.round(Number(e.target.value) || 1)) })}
-                  className={inputCls}
-                />
-              </label>
+                <div className="flex items-stretch">
+                  <input
+                    inputMode="numeric"
+                    value={it.qty === 0 ? "" : it.qty}
+                    onChange={(e) => {
+                      const v = e.target.value.replace(/\D/g, "");
+                      setField(i, { qty: v === "" ? 0 : parseInt(v, 10) });
+                    }}
+                    onBlur={() => { if (it.qty < 1) setField(i, { qty: 1 }); }}
+                    className="w-full rounded-l-lg border border-border-strong bg-bg px-2 py-2.5 text-center text-sm outline-none focus:border-gold"
+                  />
+                  <div className="flex flex-col">
+                    <button
+                      type="button"
+                      tabIndex={-1}
+                      aria-label="Увеличить количество"
+                      onClick={() => setField(i, { qty: it.qty + 1 })}
+                      className="flex h-1/2 w-7 items-center justify-center rounded-tr-lg border-y border-r border-border-strong text-[9px] text-fg-muted hover:bg-surface-2 hover:text-gold"
+                    >
+                      ▲
+                    </button>
+                    <button
+                      type="button"
+                      tabIndex={-1}
+                      aria-label="Уменьшить количество"
+                      onClick={() => setField(i, { qty: Math.max(1, it.qty - 1) })}
+                      className="flex h-1/2 w-7 items-center justify-center rounded-br-lg border-b border-r border-border-strong text-[9px] text-fg-muted hover:bg-surface-2 hover:text-gold"
+                    >
+                      ▼
+                    </button>
+                  </div>
+                </div>
+              </div>
               <label className="w-28 shrink-0">
                 <span className="mb-1 block text-[11px] text-fg-dim">Цена, ₽</span>
                 <input
