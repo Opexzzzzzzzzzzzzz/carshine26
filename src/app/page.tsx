@@ -36,7 +36,7 @@ export default async function Home() {
               <Link href="/catalog" className="shine-sweep relative overflow-hidden rounded-xl bg-gold px-6 py-3.5 font-semibold text-black transition-colors hover:bg-gold-2">
                 Перейти в каталог
               </Link>
-              <a href="tel:+79180305835" className="rounded-xl border border-border-strong px-6 py-3.5 font-medium text-fg transition-colors hover:border-gold hover:text-gold">
+              <a href="tel:+79180305835" className="rounded-xl border border-border-strong px-6 py-3.5 font-medium text-fg transition-colors hover:border-gold hover:text-gold lg:hidden">
                 Позвонить нам
               </a>
             </div>
