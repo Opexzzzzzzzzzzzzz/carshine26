@@ -19,6 +19,31 @@ type Order = {
 const inputCls =
   "w-full rounded-lg border border-border-strong bg-bg px-3 py-2.5 text-sm outline-none focus:border-gold";
 
+// Поля внутри строк состава — чуть светлее карточки, с фокус-подсветкой.
+const lineFieldCls =
+  "w-full rounded-lg border border-border-strong/70 bg-surface-2 px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-fg-dim focus:border-gold focus:ring-1 focus:ring-gold/25";
+
+function Chevron({ dir }: { dir: "up" | "down" }) {
+  return (
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+      <path
+        d={dir === "up" ? "M6 15l6-6 6 6" : "M6 9l6 6 6-6"}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m2 0v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M10 11v6M14 11v6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export default function OrderEditor({
   order,
   catalog = [],
@@ -107,20 +132,24 @@ export default function OrderEditor({
         </div>
         <div className="space-y-2">
           {items.map((it, i) => (
-            <div key={i} className="flex flex-wrap items-end gap-2 rounded-xl border border-border p-3 sm:flex-nowrap">
+            <div
+              key={i}
+              className="group flex flex-wrap items-end gap-3 rounded-xl border border-border bg-surface/40 p-3 transition-colors hover:border-border-strong sm:flex-nowrap"
+            >
               <label className="min-w-0 flex-1">
-                <span className="mb-1 block text-[11px] text-fg-dim">Товар</span>
+                <span className="mb-1.5 block text-[11px] font-medium text-fg-dim">Товар</span>
                 <input
                   value={it.title}
                   list="order-catalog"
                   autoComplete="off"
                   onChange={(e) => setField(i, { title: e.target.value })}
-                  className={inputCls}
+                  className={lineFieldCls}
                 />
               </label>
-              <div className="w-24 shrink-0">
-                <span className="mb-1 block text-[11px] text-fg-dim">Кол-во</span>
-                <div className="flex items-stretch">
+
+              <div className="w-28 shrink-0">
+                <span className="mb-1.5 block text-[11px] font-medium text-fg-dim">Кол-во</span>
+                <div className="flex items-stretch overflow-hidden rounded-lg border border-border-strong/70 bg-surface-2 transition-colors focus-within:border-gold focus-within:ring-1 focus-within:ring-gold/25">
                   <input
                     inputMode="numeric"
                     value={it.qty === 0 ? "" : it.qty}
@@ -129,53 +158,63 @@ export default function OrderEditor({
                       setField(i, { qty: v === "" ? 0 : parseInt(v, 10) });
                     }}
                     onBlur={() => { if (it.qty < 1) setField(i, { qty: 1 }); }}
-                    className="w-full rounded-l-lg border border-border-strong bg-bg px-2 py-2.5 text-center text-sm outline-none focus:border-gold"
+                    className="w-full min-w-0 bg-transparent py-2.5 pl-3 text-center text-sm tabular-nums outline-none"
                   />
-                  <div className="flex flex-col">
+                  <div className="flex w-7 shrink-0 flex-col border-l border-border-strong/70">
                     <button
                       type="button"
                       tabIndex={-1}
                       aria-label="Увеличить количество"
                       onClick={() => setField(i, { qty: it.qty + 1 })}
-                      className="flex h-1/2 w-7 items-center justify-center rounded-tr-lg border-y border-r border-border-strong text-[9px] text-fg-muted hover:bg-surface-2 hover:text-gold"
+                      className="flex flex-1 items-center justify-center text-fg-muted transition-colors hover:bg-gold/15 hover:text-gold"
                     >
-                      ▲
+                      <Chevron dir="up" />
                     </button>
                     <button
                       type="button"
                       tabIndex={-1}
                       aria-label="Уменьшить количество"
                       onClick={() => setField(i, { qty: Math.max(1, it.qty - 1) })}
-                      className="flex h-1/2 w-7 items-center justify-center rounded-br-lg border-b border-r border-border-strong text-[9px] text-fg-muted hover:bg-surface-2 hover:text-gold"
+                      className="flex flex-1 items-center justify-center border-t border-border-strong/70 text-fg-muted transition-colors hover:bg-gold/15 hover:text-gold"
                     >
-                      ▼
+                      <Chevron dir="down" />
                     </button>
                   </div>
                 </div>
               </div>
-              <label className="w-28 shrink-0">
-                <span className="mb-1 block text-[11px] text-fg-dim">Цена, ₽</span>
-                <input
-                  inputMode="numeric"
-                  value={it.price ?? ""}
-                  placeholder="—"
-                  onChange={(e) => {
-                    const v = e.target.value.trim();
-                    setField(i, { price: v === "" ? null : Math.max(0, Math.round(Number(v) || 0)) });
-                  }}
-                  className={inputCls}
-                />
+
+              <label className="w-32 shrink-0">
+                <span className="mb-1.5 block text-[11px] font-medium text-fg-dim">Цена</span>
+                <div className="flex items-stretch overflow-hidden rounded-lg border border-border-strong/70 bg-surface-2 transition-colors focus-within:border-gold focus-within:ring-1 focus-within:ring-gold/25">
+                  <input
+                    inputMode="numeric"
+                    value={it.price ?? ""}
+                    placeholder="—"
+                    onChange={(e) => {
+                      const v = e.target.value.trim();
+                      setField(i, { price: v === "" ? null : Math.max(0, Math.round(Number(v) || 0)) });
+                    }}
+                    className="w-full min-w-0 bg-transparent py-2.5 pl-3 text-right text-sm tabular-nums outline-none placeholder:text-fg-dim"
+                  />
+                  <span className="flex items-center pl-1 pr-3 text-sm text-fg-dim">₽</span>
+                </div>
               </label>
-              <div className="w-28 shrink-0 pb-2.5 text-right text-sm text-fg-muted">
-                {formatPrice(it.sum)}
+
+              <div className="w-28 shrink-0">
+                <span className="mb-1.5 block text-right text-[11px] font-medium text-fg-dim">Сумма</span>
+                <div className="py-2.5 text-right text-sm font-semibold tabular-nums text-gold">
+                  {formatPrice(it.sum)}
+                </div>
               </div>
+
               <button
                 type="button"
                 onClick={() => removeAt(i)}
                 title="Убрать позицию"
-                className="shrink-0 rounded-lg border border-danger/40 px-2.5 py-2 text-xs text-danger hover:bg-danger/10"
+                aria-label="Убрать позицию"
+                className="mb-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border text-fg-dim transition-colors hover:border-danger/50 hover:bg-danger/10 hover:text-danger"
               >
-                ✕
+                <TrashIcon />
               </button>
             </div>
           ))}
@@ -183,9 +222,9 @@ export default function OrderEditor({
         <button
           type="button"
           onClick={addRow}
-          className="mt-3 rounded-lg border border-border-strong px-3 py-2 text-sm text-fg-muted hover:border-gold hover:text-gold"
+          className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-border-strong px-3.5 py-2 text-sm text-fg-muted transition-colors hover:border-gold hover:text-gold"
         >
-          + добавить позицию
+          <span className="text-base leading-none">+</span> Добавить позицию
         </button>
       </div>
 
