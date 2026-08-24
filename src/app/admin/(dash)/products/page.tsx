@@ -32,6 +32,16 @@ export default async function AdminProducts({
   ]);
   const pages = Math.ceil(total / PER);
 
+  // Текущее состояние списка (сортировка/поиск/страница) — прокидываем в
+  // карточку товара, чтобы вернуться к тем же фильтрам, а не к голому списку.
+  const listParams = new URLSearchParams();
+  if (q) listParams.set("q", q);
+  if (sort !== "title") listParams.set("sort", sort);
+  if (p > 1) listParams.set("page", String(p));
+  const back = listParams.toString();
+  const editHref = (id: string) =>
+    `/admin/products/${id}${back ? `?back=${encodeURIComponent(back)}` : ""}`;
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -103,7 +113,7 @@ export default async function AdminProducts({
                     <img src={it.photo || undefined} alt="" className="h-10 w-10 rounded bg-[#f4f4f2] object-contain" />
                   </td>
                   <td className="max-w-sm p-3">
-                    <Link href={`/admin/products/${it.id}`} className="line-clamp-2 hover:text-gold">{it.title}</Link>
+                    <Link href={editHref(it.id)} className="line-clamp-2 hover:text-gold">{it.title}</Link>
                   </td>
                   <td className="p-3 text-fg-muted">{it.brand}</td>
                   <td className="p-3 font-medium">{formatPrice(it.price)}</td>
@@ -119,7 +129,7 @@ export default async function AdminProducts({
                     </form>
                   </td>
                   <td className="p-3">
-                    <Link href={`/admin/products/${it.id}`} className="text-gold hover:underline">Изменить</Link>
+                    <Link href={editHref(it.id)} className="text-gold hover:underline">Изменить</Link>
                   </td>
                 </tr>
               ))}

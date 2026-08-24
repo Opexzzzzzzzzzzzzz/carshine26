@@ -44,7 +44,14 @@ export async function updateProduct(formData: FormData) {
   });
   revalidatePath("/admin/products");
   revalidatePath("/catalog");
-  redirect("/admin/products?saved=1");
+  redirect(productsListUrl(formData, "saved=1"));
+}
+
+// Возврат на список товаров с сохранением фильтров (sort/q/page из поля back).
+function productsListUrl(formData: FormData, extra: string): string {
+  const back = String(formData.get("back") || "");
+  const qs = [back, extra].filter(Boolean).join("&");
+  return `/admin/products${qs ? `?${qs}` : ""}`;
 }
 
 export async function toggleStock(formData: FormData) {
@@ -61,7 +68,7 @@ export async function deleteProduct(formData: FormData) {
   await prisma.product.delete({ where: { id } });
   revalidatePath("/admin/products");
   revalidatePath("/catalog");
-  redirect("/admin/products?deleted=1");
+  redirect(productsListUrl(formData, "deleted=1"));
 }
 
 export async function createProduct(formData: FormData) {

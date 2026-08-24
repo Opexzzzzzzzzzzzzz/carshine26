@@ -13,12 +13,14 @@ export default async function EditProduct({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ created?: string }>;
+  searchParams: Promise<{ created?: string; back?: string }>;
 }) {
   const { id } = await params;
-  const { created } = await searchParams;
+  const { created, back = "" } = await searchParams;
   const p = await prisma.product.findUnique({ where: { id } });
   if (!p) notFound();
+
+  const backUrl = `/admin/products${back ? `?${back}` : ""}`;
 
   const brands = await distinctBrands();
 
@@ -32,7 +34,7 @@ export default async function EditProduct({
   return (
     <div className="max-w-3xl space-y-5">
       <div className="flex items-center justify-between">
-        <Link href="/admin/products" className="text-sm text-fg-muted hover:text-gold">← К товарам</Link>
+        <Link href={backUrl} className="text-sm text-fg-muted hover:text-gold">← К товарам</Link>
         <Link href={`/product/${p.slug}`} className="text-sm text-fg-muted hover:text-gold">Открыть на сайте ↗</Link>
       </div>
       <h1 className="font-display text-2xl font-bold">Редактирование товара</h1>
@@ -40,6 +42,7 @@ export default async function EditProduct({
 
       <form action={updateProduct} className="surface-card space-y-4 rounded-2xl p-6">
         <input type="hidden" name="id" value={p.id} />
+        <input type="hidden" name="back" value={back} />
 
         <Field label="Название">
           <input name="title" defaultValue={p.title} required className={inputCls} />
@@ -88,6 +91,7 @@ export default async function EditProduct({
 
       <form action={deleteProduct} className="border-t border-border pt-5">
         <input type="hidden" name="id" value={p.id} />
+        <input type="hidden" name="back" value={back} />
         <button className="rounded-xl border border-danger/40 px-5 py-2.5 text-sm text-danger hover:bg-danger/10">
           Удалить товар
         </button>
