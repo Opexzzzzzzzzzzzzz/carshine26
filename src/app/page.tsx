@@ -122,13 +122,17 @@ export default async function Home() {
       <section className="border-t border-border bg-bg-2">
         <div className="mx-auto max-w-7xl px-4 py-14">
           <h3 className="mb-8 text-center text-sm font-semibold uppercase tracking-widest text-fg-dim">
-            Более {allBrands.length} проверенных брендов
+            {allBrands.length} проверенных брендов
           </h3>
-          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
-            {allBrands.slice(0, 18).map((b) => (
-              <span key={b} className="font-display text-lg font-semibold text-fg-muted transition-colors hover:text-fg">
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
+            {allBrands.map((b) => (
+              <Link
+                key={b}
+                href={`/catalog?brand=${encodeURIComponent(b)}`}
+                className="font-display text-lg font-semibold text-fg-muted transition-colors hover:text-gold"
+              >
                 {b}
-              </span>
+              </Link>
             ))}
           </div>
         </div>
