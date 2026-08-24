@@ -6,8 +6,8 @@ import { randomBytes } from "node:crypto";
 
 export const runtime = "nodejs";
 
-// Лимит = максимальный размер среди текущих фото товаров (2.79 МБ) → округлён до 3 МБ.
-export const MAX_MB = 3;
+// Лимит фото. В nginx выставлен client_max_body_size 6M (с запасом над этим).
+export const MAX_MB = 5;
 const MAX_BYTES = MAX_MB * 1024 * 1024;
 
 const EXT: Record<string, string> = {

@@ -90,6 +90,10 @@ server {
     listen 80 default_server;
     server_name $DOMAIN www.$DOMAIN _;
 
+    # Разрешаем загрузку фото (иначе дефолтный лимит nginx 1 МБ режет
+    # PNG-фото товаров с ошибкой 413). В приложении лимит 5 МБ.
+    client_max_body_size 6M;
+
     # Загруженные через админку фото — отдаём напрямую с диска (next start их не отдаёт).
     location /uploads/ {
         alias $APP_DIR/public/uploads/;

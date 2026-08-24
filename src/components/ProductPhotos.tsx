@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 
-const MAX_MB = 3;
+const MAX_MB = 5;
 
 /**
  * Галерея фото товара для админки.
