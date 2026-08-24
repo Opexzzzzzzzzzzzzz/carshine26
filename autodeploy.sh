@@ -13,7 +13,10 @@ if [ "$LOCAL" = "$REMOTE" ]; then
 fi
 
 echo "===== $(date '+%F %T') : новая версия $REMOTE, деплой ====="
-git pull --quiet
+# Жёстко приводим рабочее дерево к origin/main. Иначе локальные изменения
+# (например, package-lock.json, который npm install переписывает на сервере)
+# ломают git pull и деплой встаёт. Сервер всегда зеркалит origin/main.
+git reset --hard origin/main --quiet
 npm install --include=dev --no-audit --no-fund
 npx prisma db push
 NODE_OPTIONS="--max-old-space-size=1536" npm run build
