@@ -71,6 +71,9 @@ export default async function EditProduct({
 
         <Field label="Описание">
           <textarea name="description" defaultValue={p.description} rows={8} className={inputCls} />
+          <span className="mt-1 block text-xs text-fg-dim">
+            Поддерживается разметка: **жирный**, списки через «- » в начале строки, переносы строк сохраняются. Можно вставлять текст с другого сайта.
+          </span>
         </Field>
 
         <label className="flex cursor-pointer items-center gap-2.5 text-sm text-fg-muted">

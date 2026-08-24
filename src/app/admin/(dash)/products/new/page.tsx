@@ -49,6 +49,9 @@ export default async function NewProduct() {
         <label className="block">
           <span className="mb-1 block text-xs text-fg-muted">Описание</span>
           <textarea name="description" rows={6} className={inputCls} />
+          <span className="mt-1 block text-xs text-fg-dim">
+            Поддерживается разметка: **жирный**, списки через «- » в начале строки, переносы строк сохраняются. Можно вставлять текст с другого сайта.
+          </span>
         </label>
         <label className="flex cursor-pointer items-center gap-2.5 text-sm text-fg-muted">
           <input type="checkbox" name="inStock" defaultChecked className="h-4 w-4 accent-[var(--gold)]" />

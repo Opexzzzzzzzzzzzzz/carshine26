@@ -6,6 +6,7 @@ import { getProductBySlug, relatedProductsLite } from "@/lib/queries";
 import ProductGallery from "@/components/ProductGallery";
 import ProductCard from "@/components/ProductCard";
 import ProductActions from "@/components/ProductActions";
+import Markdown from "@/components/Markdown";
 
 export async function generateMetadata({
   params,
@@ -102,7 +103,7 @@ export default async function ProductPage({
           {p.description && (
             <div className="mt-8 surface-card rounded-2xl p-5">
               <h3 className="mb-3 font-semibold">Описание</h3>
-              <p className="whitespace-pre-line leading-relaxed text-fg-muted">{p.description}</p>
+              <Markdown>{p.description}</Markdown>
             </div>
           )}
 
