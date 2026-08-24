@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { groups, categoriesOfGroup } from "@/lib/shop";
 import { useCart } from "@/lib/cart";
 import CategoryIcon from "./CategoryIcon";
@@ -11,9 +11,17 @@ import CategoryIcon from "./CategoryIcon";
 export default function Header() {
   const { count, setOpen } = useCart();
   const router = useRouter();
+  const pathname = usePathname();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [q, setQ] = useState("");
+
+  // Закрываем мобильное меню и дропдауны при любой смене маршрута — надёжнее,
+  // чем onClick (переход Next оборачивается в transition и может отложить его).
+  useEffect(() => {
+    setMobileOpen(false);
+    setOpenMenu(null);
+  }, [pathname]);
 
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
