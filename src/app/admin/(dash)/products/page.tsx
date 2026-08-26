@@ -1,8 +1,9 @@
 import Link from "next/link";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
-import { formatPrice } from "@/lib/shop";
+import { formatPrice, categoryBySlug } from "@/lib/shop";
 import { toggleStock } from "../../actions";
+import AdminCategoryFilter from "@/components/AdminCategoryFilter";
 
 export const dynamic = "force-dynamic";
 const PER = 30;
@@ -10,13 +11,15 @@ const PER = 30;
 export default async function AdminProducts({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; page?: string; saved?: string; deleted?: string; sort?: string }>;
+  searchParams: Promise<{ q?: string; page?: string; saved?: string; deleted?: string; sort?: string; cat?: string }>;
 }) {
-  const { q = "", page = "1", saved, deleted, sort = "title" } = await searchParams;
+  const { q = "", page = "1", saved, deleted, sort = "title", cat = "" } = await searchParams;
   const p = Math.max(1, Number(page) || 1);
-  const where: Prisma.ProductWhereInput = q
-    ? { OR: [{ title: { contains: q } }, { brand: { contains: q } }] }
-    : {};
+  const catValid = cat && categoryBySlug(cat) ? cat : "";
+  const where: Prisma.ProductWhereInput = {
+    ...(catValid ? { categorySlug: catValid } : {}),
+    ...(q ? { OR: [{ title: { contains: q } }, { brand: { contains: q } }] } : {}),
+  };
   const orderBy: Prisma.ProductOrderByWithRelationInput =
     sort === "new" ? { createdAt: "desc" } : { title: "asc" };
 
@@ -36,6 +39,7 @@ export default async function AdminProducts({
   // карточку товара, чтобы вернуться к тем же фильтрам, а не к голому списку.
   const listParams = new URLSearchParams();
   if (q) listParams.set("q", q);
+  if (catValid) listParams.set("cat", catValid);
   if (sort !== "title") listParams.set("sort", sort);
   if (p > 1) listParams.set("page", String(p));
   const back = listParams.toString();
@@ -58,16 +62,20 @@ export default async function AdminProducts({
       )}
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <form className="flex gap-2">
-          <input type="hidden" name="sort" value={sort} />
-          <input
-            name="q"
-            defaultValue={q}
-            placeholder="Поиск по названию или бренду…"
-            className="w-72 max-w-full rounded-lg border border-border-strong bg-surface px-3 py-2 text-sm outline-none focus:border-gold"
-          />
-          <button className="rounded-lg border border-border-strong px-4 py-2 text-sm hover:border-gold hover:text-gold">Найти</button>
-        </form>
+        <div className="flex flex-wrap items-center gap-2">
+          <form className="flex gap-2">
+            <input type="hidden" name="sort" value={sort} />
+            {catValid && <input type="hidden" name="cat" value={catValid} />}
+            <input
+              name="q"
+              defaultValue={q}
+              placeholder="Поиск по названию или бренду…"
+              className="w-64 max-w-full rounded-lg border border-border-strong bg-surface px-3 py-2 text-sm outline-none focus:border-gold"
+            />
+            <button className="rounded-lg border border-border-strong px-4 py-2 text-sm hover:border-gold hover:text-gold">Найти</button>
+          </form>
+          <AdminCategoryFilter cat={catValid} q={q} sort={sort} />
+        </div>
 
         <div className="flex items-center gap-1 text-sm">
           <span className="mr-1 text-xs text-fg-dim">Сортировка:</span>
@@ -77,6 +85,7 @@ export default async function AdminProducts({
           ].map(([s, label]) => {
             const params = new URLSearchParams();
             if (q) params.set("q", q);
+            if (catValid) params.set("cat", catValid);
             if (s !== "title") params.set("sort", s);
             const qs = params.toString();
             return (
@@ -144,6 +153,7 @@ export default async function AdminProducts({
             const n = i + 1;
             const params = new URLSearchParams();
             if (q) params.set("q", q);
+            if (catValid) params.set("cat", catValid);
             if (sort !== "title") params.set("sort", sort);
             params.set("page", String(n));
             return (
