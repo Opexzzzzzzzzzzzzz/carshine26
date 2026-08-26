@@ -1,7 +1,6 @@
 // Клиент-безопасный слой: типы, справочники (категории/бренды/группы), утилиты.
 // Данные товаров теперь в БД — запросы в src/lib/queries.ts (server-only).
 import categoriesData from "@/data/categories.json";
-import brandsData from "@/data/brands.json";
 import { groups, groupByCategory } from "@/lib/groups";
 
 export { groups };
@@ -46,8 +45,6 @@ export const categoryBySlug = (slug: string) => categoryMap.get(slug);
 export const groupBySlug = (slug: string) => groups.find((g) => g.slug === slug);
 export const categoriesOfGroup = (groupSlug: string) =>
   categories.filter((c) => c.group === groupSlug);
-
-export const allBrands = brandsData as string[];
 
 export const brandsOf = (list: Product[]) =>
   Array.from(new Set(list.map((p) => p.brand).filter(Boolean))).sort((a, b) =>

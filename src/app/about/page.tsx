@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { totalProducts, allBrands } from "@/lib/shop";
+import { totalProducts } from "@/lib/shop";
+import { distinctBrands } from "@/lib/queries";
 
 export const metadata: Metadata = {
   title: "О нас",
   description: "CarShine — магазин автохимии и товаров для детейлинга в Ставрополе.",
 };
 
-export default function AboutPage() {
+export const dynamic = "force-dynamic";
+
+export default async function AboutPage() {
+  const brandsCount = (await distinctBrands()).length;
   return (
     <div className="mx-auto max-w-3xl px-4 py-14">
       <nav className="mb-2 text-xs text-fg-dim">
@@ -22,7 +26,7 @@ export default function AboutPage() {
           товар и всегда поможем с выбором — и для новичка, и для профи.
         </p>
         <p>
-          В каталоге более {totalProducts.toLocaleString("ru-RU")} товаров от {allBrands.length}{" "}
+          В каталоге более {totalProducts.toLocaleString("ru-RU")} товаров от {brandsCount}{" "}
           проверенных брендов: полироли и пасты, шампуни, керамика и защитные составы,
           оборудование, микрофибра и аксессуары для детейлинга.
         </p>
@@ -35,7 +39,7 @@ export default function AboutPage() {
       <div className="mt-10 grid gap-4 sm:grid-cols-3">
         {[
           [`${totalProducts.toLocaleString("ru-RU")}+`, "товаров"],
-          [`${allBrands.length}`, "брендов"],
+          [`${brandsCount}`, "брендов"],
           ["CDEK", "доставка по РФ"],
         ].map(([a, b]) => (
           <div key={b} className="surface-card rounded-2xl p-5 text-center">

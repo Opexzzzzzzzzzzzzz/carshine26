@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { groups, allBrands, totalProducts, categoriesOfGroup, plural } from "@/lib/shop";
-import { featuredProductsLite } from "@/lib/queries";
+import { groups, totalProducts, categoriesOfGroup, plural } from "@/lib/shop";
+import { featuredProductsLite, distinctBrands } from "@/lib/queries";
 import ProductCard from "@/components/ProductCard";
 import CategoryIcon from "@/components/CategoryIcon";
 import NewSiteNotice from "@/components/NewSiteNotice";
@@ -8,7 +8,7 @@ import NewSiteNotice from "@/components/NewSiteNotice";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const featured = await featuredProductsLite(8);
+  const [featured, brands] = await Promise.all([featuredProductsLite(8), distinctBrands()]);
 
   return (
     <>
@@ -43,7 +43,7 @@ export default async function Home() {
             <div className="mt-10 flex flex-wrap gap-x-8 gap-y-4">
               {[
                 [`${totalProducts.toLocaleString("ru-RU")}+`, "товаров в каталоге"],
-                [`${allBrands.length} ${plural(allBrands.length, ["бренд", "бренда", "брендов"])}`, "профессионального уровня"],
+                [`${brands.length} ${plural(brands.length, ["бренд", "бренда", "брендов"])}`, "профессионального уровня"],
                 ["CDEK", "доставка по России"],
               ].map(([a, b]) => (
                 <div key={b}>
@@ -122,10 +122,10 @@ export default async function Home() {
       <section className="border-t border-border bg-bg-2">
         <div className="mx-auto max-w-7xl px-4 py-14">
           <h3 className="mb-8 text-center text-sm font-semibold uppercase tracking-widest text-fg-dim">
-            {allBrands.length} проверенных брендов
+            {brands.length} проверенных брендов
           </h3>
           <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
-            {allBrands.map((b) => (
+            {brands.map((b) => (
               <Link
                 key={b}
                 href={`/catalog?brand=${encodeURIComponent(b)}`}
