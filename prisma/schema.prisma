@@ -28,11 +28,17 @@ model Product {
   photo        String   @default("")
   photosJson   String   @default("[]")
   inStock      Boolean  @default(true)
+  // Скидка: "" — нет, "percent" — процент, "amount" — сумма в рублях от цены.
+  discountType  String  @default("")
+  discountValue Int     @default(0)
+  // Участвует в разделе «Распродажа» (только при активной скидке).
+  onSale        Boolean @default(false)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   @@index([categorySlug])
   @@index([brand])
+  @@index([onSale])
 }
 
 model Setting {

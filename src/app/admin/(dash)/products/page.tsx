@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
-import { formatPrice, categoryBySlug } from "@/lib/shop";
+import { formatPrice, categoryBySlug, computeDiscount } from "@/lib/shop";
 import { toggleStock } from "../../actions";
 import AdminCategoryFilter from "@/components/AdminCategoryFilter";
 
@@ -29,7 +29,18 @@ export default async function AdminProducts({
       orderBy,
       skip: (p - 1) * PER,
       take: PER,
-      select: { id: true, slug: true, title: true, brand: true, price: true, photo: true, inStock: true },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        brand: true,
+        price: true,
+        photo: true,
+        inStock: true,
+        discountType: true,
+        discountValue: true,
+        onSale: true,
+      },
     }),
     prisma.product.count({ where }),
   ]);
@@ -125,7 +136,22 @@ export default async function AdminProducts({
                     <Link href={editHref(it.id)} className="line-clamp-2 hover:text-gold">{it.title}</Link>
                   </td>
                   <td className="p-3 text-fg-muted">{it.brand}</td>
-                  <td className="p-3 font-medium">{formatPrice(it.price)}</td>
+                  <td className="p-3">
+                    {(() => {
+                      const d = computeDiscount(it.price, it.discountType, it.discountValue);
+                      if (!d.valid) return <span className="font-medium">{formatPrice(it.price)}</span>;
+                      return (
+                        <div>
+                          <div className="font-medium text-danger">{formatPrice(d.final)}</div>
+                          <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs">
+                            <span className="text-fg-dim line-through">{formatPrice(it.price)}</span>
+                            <span className="rounded bg-danger/15 px-1.5 text-danger">{d.label}</span>
+                            {it.onSale && <span className="rounded bg-gold/15 px-1.5 text-gold">распродажа</span>}
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </td>
                   <td className="p-3">
                     <form action={toggleStock}>
                       <input type="hidden" name="id" value={it.id} />

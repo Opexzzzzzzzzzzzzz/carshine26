@@ -3,6 +3,7 @@ import { categories } from "@/lib/shop";
 import { distinctBrands } from "@/lib/queries";
 import { createProduct } from "../../../actions";
 import ProductPhotos from "@/components/ProductPhotos";
+import PricingFields from "@/components/PricingFields";
 
 export const dynamic = "force-dynamic";
 
@@ -30,18 +31,15 @@ export default async function NewProduct() {
             </datalist>
           </label>
           <label className="block">
-            <span className="mb-1 block text-xs text-fg-muted">Цена, ₽</span>
-            <input name="price" inputMode="numeric" className={inputCls} />
+            <span className="mb-1 block text-xs text-fg-muted">Категория</span>
+            <select name="categorySlug" defaultValue="prochee" className={inputCls}>
+              {categories.map((c) => (
+                <option key={c.slug} value={c.slug}>{c.title}</option>
+              ))}
+            </select>
           </label>
         </div>
-        <label className="block">
-          <span className="mb-1 block text-xs text-fg-muted">Категория</span>
-          <select name="categorySlug" defaultValue="prochee" className={inputCls}>
-            {categories.map((c) => (
-              <option key={c.slug} value={c.slug}>{c.title}</option>
-            ))}
-          </select>
-        </label>
+        <PricingFields />
         <div>
           <span className="mb-1 block text-xs text-fg-muted">Фото товара</span>
           <ProductPhotos name="photos" />

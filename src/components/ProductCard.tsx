@@ -5,6 +5,7 @@ import type { Product } from "@/lib/shop";
 import { formatPrice } from "@/lib/shop";
 import { useCart } from "@/lib/cart";
 import ProductImage from "./ProductImage";
+import DiscountBadge from "./DiscountBadge";
 
 export default function ProductCard({ product }: { product: Product }) {
   const { add } = useCart();
@@ -17,8 +18,9 @@ export default function ProductCard({ product }: { product: Product }) {
 
   return (
     <div className="group surface-card relative flex flex-col overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:border-border-strong hover:shadow-[0_20px_50px_-20px_rgba(0,0,0,0.8)]">
-      <Link href={`/product/${product.slug}`} className="block">
+      <Link href={`/product/${product.slug}`} className="relative block">
         <ProductImage product={product} className="aspect-square w-full" />
+        {product.discount && <DiscountBadge label={product.discount} />}
       </Link>
 
       <div className="flex flex-1 flex-col p-4">
@@ -46,8 +48,13 @@ export default function ProductCard({ product }: { product: Product }) {
         </div>
 
         <div className="mt-auto flex items-end justify-between gap-2 pt-4">
-          <div className="text-lg font-semibold text-fg">
-            {formatPrice(product.price)}
+          <div className="min-w-0">
+            {product.oldPrice != null && (
+              <div className="text-xs text-fg-dim line-through">{formatPrice(product.oldPrice)}</div>
+            )}
+            <div className={`text-lg font-semibold ${product.oldPrice != null ? "text-danger" : "text-fg"}`}>
+              {formatPrice(product.price)}
+            </div>
           </div>
           <button
             onClick={() => add(snapshot)}

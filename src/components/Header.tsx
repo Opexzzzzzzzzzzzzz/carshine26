@@ -36,6 +36,9 @@ export default function Header() {
             📦 Доставка по Ставрополю и всей России
           </span>
           <div className="flex items-center gap-4">
+            <Link href="/sale" className="inline-flex items-center gap-1 font-semibold text-danger transition-opacity hover:opacity-80">
+              <CategoryIcon name="local_offer" className="text-sm" /> Распродажа
+            </Link>
             <a href="tel:+79180305835" className="hover:text-gold">
               +7 918 030-58-35
             </a>
@@ -150,6 +153,14 @@ export default function Header() {
                 {g.title}
               </Link>
             ))}
+            <Link
+              href="/sale"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-3 py-3 text-sm font-semibold text-danger"
+            >
+              <CategoryIcon name="local_offer" className="text-lg" />
+              Распродажа
+            </Link>
           </div>
         </div>
       )}

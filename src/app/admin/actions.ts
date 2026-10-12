@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
+import { computeDiscount } from "@/lib/shop";
 
 function toPrice(v: FormDataEntryValue | null): number | null {
   const s = String(v ?? "").replace(/\s/g, "").replace(",", ".");
@@ -25,21 +26,34 @@ function readPhotos(formData: FormData): { photo: string; photosJson: string } {
   return { photo: list[0] || "", photosJson: JSON.stringify(list) };
 }
 
+// Скидка и распродажа из формы. Невалидная скидка (нет цены, процент вне 1–99,
+// сумма ≥ цены) сбрасывается вместе с распродажей.
+function readDiscount(formData: FormData, price: number | null) {
+  const type = String(formData.get("discountType") || "");
+  const value = toPrice(formData.get("discountValue")) ?? 0;
+  if (!computeDiscount(price, type, value).valid) {
+    return { discountType: "", discountValue: 0, onSale: false };
+  }
+  return { discountType: type, discountValue: value, onSale: formData.get("onSale") === "on" };
+}
+
 export async function updateProduct(formData: FormData) {
   await requireAuth();
   const id = String(formData.get("id"));
   const { photo, photosJson } = readPhotos(formData);
+  const price = toPrice(formData.get("price"));
   await prisma.product.update({
     where: { id },
     data: {
       title: String(formData.get("title") || "").trim(),
       brand: String(formData.get("brand") || "").trim(),
-      price: toPrice(formData.get("price")),
+      price,
       categorySlug: String(formData.get("categorySlug") || ""),
       description: String(formData.get("description") || "").trim(),
       photo,
       photosJson,
       inStock: formData.get("inStock") === "on",
+      ...readDiscount(formData, price),
     },
   });
   revalidatePath("/admin/products");
@@ -75,18 +89,20 @@ export async function createProduct(formData: FormData) {
   await requireAuth();
   const id = "m" + Date.now().toString(36);
   const { photo, photosJson } = readPhotos(formData);
+  const price = toPrice(formData.get("price"));
   await prisma.product.create({
     data: {
       id,
       slug: id,
       title: String(formData.get("title") || "").trim() || "Без названия",
       brand: String(formData.get("brand") || "").trim(),
-      price: toPrice(formData.get("price")),
+      price,
       categorySlug: String(formData.get("categorySlug") || "prochee"),
       description: String(formData.get("description") || "").trim(),
       photo,
       photosJson,
       inStock: formData.get("inStock") === "on",
+      ...readDiscount(formData, price),
     },
   });
   revalidatePath("/admin/products");

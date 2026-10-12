@@ -7,6 +7,7 @@ import ProductGallery from "@/components/ProductGallery";
 import ProductCard from "@/components/ProductCard";
 import ProductActions from "@/components/ProductActions";
 import Markdown from "@/components/Markdown";
+import DiscountBadge from "@/components/DiscountBadge";
 
 export async function generateMetadata({
   params,
@@ -69,13 +70,28 @@ export default async function ProductPage({
       </nav>
 
       <div className="grid gap-10 lg:grid-cols-2">
-        <ProductGallery photos={p.photos} title={p.title} />
+        <div className="relative">
+          <ProductGallery photos={p.photos} title={p.title} />
+          {p.discount && <DiscountBadge label={p.discount} size="lg" />}
+        </div>
 
         <div>
           <div className="text-sm uppercase tracking-wider text-fg-dim">{p.brand}</div>
           <h1 className="mt-2 font-display text-2xl font-bold leading-snug sm:text-3xl">{p.title}</h1>
 
-          <div className="mt-6 font-display text-4xl font-bold">{formatPrice(p.price)}</div>
+          <div className="mt-6 flex flex-wrap items-end gap-x-4 gap-y-2">
+            <div className={`font-display text-4xl font-bold ${p.oldPrice != null ? "text-danger" : ""}`}>
+              {formatPrice(p.price)}
+            </div>
+            {p.oldPrice != null && (
+              <>
+                <div className="pb-1 text-xl text-fg-dim line-through">{formatPrice(p.oldPrice)}</div>
+                <span className="mb-1.5 rounded-lg bg-danger/15 px-2.5 py-1 text-sm font-semibold text-danger">
+                  Выгода {formatPrice(p.oldPrice - (p.price ?? 0))}
+                </span>
+              </>
+            )}
+          </div>
 
           <div className="mt-2 text-sm">
             {p.inStock ? (

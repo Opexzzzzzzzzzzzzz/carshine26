@@ -18,7 +18,30 @@ export type Product = {
   photo: string;
   photos: string[];
   inStock: boolean;
+  // price — итоговая цена (со скидкой). oldPrice — цена до скидки, если скидка есть.
+  oldPrice: number | null;
+  discount: string; // подпись бейджа: «−15%» / «−500 ₽», пусто если скидки нет
+  onSale: boolean;
 };
+
+export type DiscountType = "" | "percent" | "amount";
+
+// Единый расчёт скидки для витрины, админки и сервера.
+export function computeDiscount(price: number | null, type: string, value: number) {
+  const v = Math.round(Number(value) || 0);
+  if (price == null || price <= 0) return { valid: false, final: price, label: "" };
+  if (type === "percent" && v >= 1 && v <= 99) {
+    return { valid: true, final: Math.round((price * (100 - v)) / 100), label: `−${v}%` };
+  }
+  if (type === "amount" && v >= 1 && v < price) {
+    return {
+      valid: true,
+      final: price - v,
+      label: `−${new Intl.NumberFormat("ru-RU").format(v)} ₽`,
+    };
+  }
+  return { valid: false, final: price, label: "" };
+}
 
 // Снимок товара для корзины/избранного (кладётся в localStorage при добавлении).
 export type CartSnapshot = {

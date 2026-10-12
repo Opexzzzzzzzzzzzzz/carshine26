@@ -5,6 +5,7 @@ import { categories } from "@/lib/shop";
 import { distinctBrands } from "@/lib/queries";
 import { updateProduct, deleteProduct } from "../../../actions";
 import ProductPhotos from "@/components/ProductPhotos";
+import PricingFields from "@/components/PricingFields";
 
 export const dynamic = "force-dynamic";
 
@@ -55,18 +56,21 @@ export default async function EditProduct({
               {brands.map((b) => <option key={b} value={b} />)}
             </datalist>
           </Field>
-          <Field label="Цена, ₽ (пусто = по запросу)">
-            <input name="price" defaultValue={p.price ?? ""} inputMode="numeric" className={inputCls} />
+          <Field label="Категория">
+            <select name="categorySlug" defaultValue={p.categorySlug} className={inputCls}>
+              {categories.map((c) => (
+                <option key={c.slug} value={c.slug}>{c.title}</option>
+              ))}
+            </select>
           </Field>
         </div>
 
-        <Field label="Категория">
-          <select name="categorySlug" defaultValue={p.categorySlug} className={inputCls}>
-            {categories.map((c) => (
-              <option key={c.slug} value={c.slug}>{c.title}</option>
-            ))}
-          </select>
-        </Field>
+        <PricingFields
+          price={p.price}
+          discountType={p.discountType}
+          discountValue={p.discountValue}
+          onSale={p.onSale}
+        />
 
         <Field label="Фото товара">
           <ProductPhotos name="photos" defaultValue={photos} />

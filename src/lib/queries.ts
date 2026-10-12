@@ -1,6 +1,6 @@
 import "server-only";
 import { prisma } from "@/lib/db";
-import { categoryBySlug, groupBySlug, type Product } from "@/lib/shop";
+import { categoryBySlug, computeDiscount, groupBySlug, type Product } from "@/lib/shop";
 
 const lightSelect = {
   id: true,
@@ -11,6 +11,9 @@ const lightSelect = {
   photo: true,
   categorySlug: true,
   inStock: true,
+  discountType: true,
+  discountValue: true,
+  onSale: true,
 } as const;
 
 type LightRow = {
@@ -22,7 +25,23 @@ type LightRow = {
   photo: string;
   categorySlug: string;
   inStock: boolean;
+  discountType: string;
+  discountValue: number;
+  onSale: boolean;
 };
+
+type PriceRow = { price: number | null; discountType: string; discountValue: number; onSale: boolean };
+
+// Итоговая цена/старая цена/бейдж. Распродажа учитывается только при активной скидке.
+function pricing(r: PriceRow) {
+  const d = computeDiscount(r.price, r.discountType, r.discountValue);
+  return {
+    price: d.valid ? d.final : r.price,
+    oldPrice: d.valid ? r.price : null,
+    discount: d.label,
+    onSale: d.valid && r.onSale,
+  };
+}
 
 function liteToProduct(r: LightRow): Product {
   return {
@@ -30,13 +49,13 @@ function liteToProduct(r: LightRow): Product {
     slug: r.slug,
     title: r.title,
     brand: r.brand,
-    price: r.price,
     category: r.categorySlug,
     categoryName: categoryBySlug(r.categorySlug)?.title ?? "",
     description: "",
     photo: r.photo,
     photos: r.photo ? [r.photo] : [],
     inStock: r.inStock,
+    ...pricing(r),
   };
 }
 
@@ -54,14 +73,25 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
     slug: r.slug,
     title: r.title,
     brand: r.brand,
-    price: r.price,
     category: r.categorySlug,
     categoryName: categoryBySlug(r.categorySlug)?.title ?? "",
     description: r.description,
     photo: r.photo,
     photos: photos.length ? photos : r.photo ? [r.photo] : [],
     inStock: r.inStock,
+    ...pricing(r),
   };
+}
+
+// Товары распродажи (только с активной скидкой), свежие изменения первыми.
+export async function saleProductsLite(limit?: number): Promise<Product[]> {
+  const rows = await prisma.product.findMany({
+    where: { onSale: true },
+    select: lightSelect,
+    orderBy: { updatedAt: "desc" },
+  });
+  const list = rows.map(liteToProduct).filter((p) => p.onSale);
+  return limit ? list.slice(0, limit) : list;
 }
 
 export async function allProductsLite(): Promise<Product[]> {
@@ -71,10 +101,12 @@ export async function allProductsLite(): Promise<Product[]> {
 
 // Названия товаров + цены (для автоподсказок в редакторе заказа).
 export async function productTitlesForPicker(): Promise<{ title: string; price: number | null }[]> {
-  return prisma.product.findMany({
-    select: { title: true, price: true },
+  const rows = await prisma.product.findMany({
+    select: { title: true, price: true, discountType: true, discountValue: true, onSale: true },
     orderBy: { title: "asc" },
   });
+  // Цена с учётом скидки — как её видит покупатель.
+  return rows.map((r) => ({ title: r.title, price: pricing(r).price }));
 }
 
 // Актуальный список брендов из БД (для автоподсказок в админке).

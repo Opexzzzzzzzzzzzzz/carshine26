@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { groups, totalProducts, categoriesOfGroup, plural } from "@/lib/shop";
-import { featuredProductsLite, distinctBrands } from "@/lib/queries";
+import { featuredProductsLite, distinctBrands, saleProductsLite } from "@/lib/queries";
+import SaleCarousel from "@/components/SaleCarousel";
 import ProductCard from "@/components/ProductCard";
 import CategoryIcon from "@/components/CategoryIcon";
 import NewSiteNotice from "@/components/NewSiteNotice";
@@ -8,7 +9,11 @@ import NewSiteNotice from "@/components/NewSiteNotice";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [featured, brands] = await Promise.all([featuredProductsLite(8), distinctBrands()]);
+  const [featured, brands, sale] = await Promise.all([
+    featuredProductsLite(8),
+    distinctBrands(),
+    saleProductsLite(),
+  ]);
 
   return (
     <>
@@ -92,6 +97,9 @@ export default async function Home() {
           ))}
         </div>
       </section>
+
+      {/* Распродажа — только если есть товары со скидкой */}
+      {sale.length > 0 && <SaleCarousel products={sale.slice(0, 12)} total={sale.length} />}
 
       {/* Разделы каталога */}
       <section className="mx-auto max-w-7xl px-4 py-16">
