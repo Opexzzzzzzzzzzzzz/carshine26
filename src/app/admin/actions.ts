@@ -68,6 +68,31 @@ function productsListUrl(formData: FormData, extra: string): string {
   return `/admin/products${qs ? `?${qs}` : ""}`;
 }
 
+// Быстрая смена цены прямо из списка товаров. Пусто = «по запросу».
+// Если новая цена делает скидку невалидной — скидка и распродажа сбрасываются.
+export async function updateProductPrice(id: string, raw: string) {
+  await requireAuth();
+  const s = raw.replace(/\s/g, "").replace(",", ".");
+  if (s && !Number.isFinite(Number(s))) {
+    return { ok: false as const, error: "Введите число" };
+  }
+  const price = toPrice(s);
+  const cur = await prisma.product.findUnique({
+    where: { id },
+    select: { discountType: true, discountValue: true },
+  });
+  if (!cur) return { ok: false as const, error: "Товар не найден" };
+
+  const keep = computeDiscount(price, cur.discountType, cur.discountValue).valid;
+  const r = await prisma.product.update({
+    where: { id },
+    data: keep ? { price } : { price, discountType: "", discountValue: 0, onSale: false },
+    select: { price: true, discountType: true, discountValue: true, onSale: true },
+  });
+  revalidatePath("/admin/products");
+  return { ok: true as const, ...r, discountReset: !keep && cur.discountType !== "" };
+}
+
 export async function toggleStock(formData: FormData) {
   await requireAuth();
   const id = String(formData.get("id"));
