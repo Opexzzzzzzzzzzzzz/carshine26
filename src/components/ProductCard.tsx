@@ -8,7 +8,8 @@ import ProductImage from "./ProductImage";
 import DiscountBadge from "./DiscountBadge";
 
 export default function ProductCard({ product }: { product: Product }) {
-  const { add } = useCart();
+  const { add, lines, setQty } = useCart();
+  const inCart = lines.find((l) => l.slug === product.slug)?.qty ?? 0;
   const snapshot = {
     slug: product.slug,
     title: product.title,
@@ -47,8 +48,8 @@ export default function ProductCard({ product }: { product: Product }) {
           )}
         </div>
 
-        <div className="mt-auto flex items-end justify-between gap-2 pt-4">
-          <div className="min-w-0">
+        <div className="mt-auto flex flex-wrap items-end justify-between gap-2 pt-4">
+          <div className="whitespace-nowrap">
             {product.oldPrice != null && (
               <div className="text-xs text-fg-dim line-through">{formatPrice(product.oldPrice)}</div>
             )}
@@ -56,13 +57,36 @@ export default function ProductCard({ product }: { product: Product }) {
               {formatPrice(product.price)}
             </div>
           </div>
-          <button
-            onClick={() => add(snapshot)}
-            className="shine-sweep relative overflow-hidden rounded-xl bg-gold px-3.5 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-gold-2 active:scale-95"
-            aria-label="В корзину"
-          >
-            В корзину
-          </button>
+          {inCart > 0 ? (
+            <div className="shrink-0 text-center">
+              <div className="mb-1 text-[10px] font-medium uppercase tracking-wider text-gold">В корзине</div>
+              <div className="flex h-9 items-center overflow-hidden rounded-xl border border-gold/60 bg-gold/10">
+                <button
+                  onClick={() => setQty(product.slug, inCart - 1)}
+                  className="h-full w-8 text-fg-muted transition-colors hover:bg-gold/20 hover:text-gold"
+                  aria-label="Убрать одну штуку"
+                >
+                  −
+                </button>
+                <span className="min-w-6 text-center text-sm font-semibold tabular-nums">{inCart}</span>
+                <button
+                  onClick={() => setQty(product.slug, inCart + 1)}
+                  className="h-full w-8 text-fg-muted transition-colors hover:bg-gold/20 hover:text-gold"
+                  aria-label="Добавить ещё одну"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => add(snapshot)}
+              className="shine-sweep relative overflow-hidden rounded-xl bg-gold px-3.5 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-gold-2 active:scale-95"
+              aria-label="В корзину"
+            >
+              В корзину
+            </button>
+          )}
         </div>
       </div>
     </div>
