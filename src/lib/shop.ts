@@ -77,6 +77,37 @@ export const brandsOf = (list: Product[]) =>
 export const formatPrice = (n: number | null) =>
   n == null ? "Цена по запросу" : new Intl.NumberFormat("ru-RU").format(n) + " ₽";
 
+// ── Поиск ────────────────────────────────────────────────────────────────
+// Названия часто копируют с других сайтов: там бывают неразрывные/невидимые
+// пробелы, латинские буквы-двойники вместо русских (A/А, C/С, O/О…), «ё».
+// Приводим и запрос, и текст к одному «скелету» перед сравнением.
+const LOOKALIKE: Record<string, string> = {
+  a: "а", b: "в", c: "с", e: "е", h: "н", k: "к", m: "м",
+  o: "о", p: "р", t: "т", x: "х", y: "у",
+};
+const INVISIBLE = new RegExp("[\\u00A0\\u2000-\\u200F\\u2028\\u2029\\u202F\\u205F\\u2060\\u3000\\uFEFF]", "g");
+
+export function normalizeSearch(s: string): string {
+  return s
+    .normalize("NFKC")
+    .replace(INVISIBLE, " ")
+    .toLowerCase()
+    .replace(/ё/g, "е")
+    .replace(/[a-z]/g, (ch) => LOOKALIKE[ch] ?? ch)
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
+}
+
+// Совпадение: все слова запроса есть в тексте (в любом порядке),
+// либо запрос без пробелов входит в текст без пробелов («мехполировальник»).
+// Оба аргумента — уже нормализованные normalizeSearch.
+export function matchesSearch(haystack: string, query: string): boolean {
+  if (!query) return true;
+  const words = query.split(" ").filter(Boolean);
+  if (words.every((w) => haystack.includes(w))) return true;
+  return haystack.replace(/ /g, "").includes(query.replace(/ /g, ""));
+}
+
 // Русское склонение: plural(n, ["бренд","бренда","брендов"])
 export const plural = (n: number, forms: [string, string, string]) => {
   const n10 = n % 10;

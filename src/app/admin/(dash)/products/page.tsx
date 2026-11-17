@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
-import { categoryBySlug } from "@/lib/shop";
+import { categoryBySlug, matchesSearch, normalizeSearch } from "@/lib/shop";
 import { toggleStock } from "../../actions";
 import AdminCategoryFilter from "@/components/AdminCategoryFilter";
 import AdminPriceCell from "@/components/AdminPriceCell";
@@ -17,9 +17,22 @@ export default async function AdminProducts({
   const { q = "", page = "1", saved, deleted, sort = "title", cat = "" } = await searchParams;
   const p = Math.max(1, Number(page) || 1);
   const catValid = cat && categoryBySlug(cat) ? cat : "";
+  // Поиск — той же нормализацией, что на сайте (SQLite LIKE не понимает
+  // регистр кириллицы, неразрывные пробелы и латинские буквы-двойники).
+  let matchedIds: string[] | null = null;
+  const qn = normalizeSearch(q);
+  if (qn) {
+    const all = await prisma.product.findMany({
+      where: catValid ? { categorySlug: catValid } : {},
+      select: { id: true, title: true, brand: true },
+    });
+    matchedIds = all
+      .filter((r) => matchesSearch(normalizeSearch(`${r.title} ${r.brand}`), qn))
+      .map((r) => r.id);
+  }
   const where: Prisma.ProductWhereInput = {
     ...(catValid ? { categorySlug: catValid } : {}),
-    ...(q ? { OR: [{ title: { contains: q } }, { brand: { contains: q } }] } : {}),
+    ...(matchedIds ? { id: { in: matchedIds } } : {}),
   };
   const orderBy: Prisma.ProductOrderByWithRelationInput =
     sort === "new" ? { createdAt: "desc" } : { title: "asc" };

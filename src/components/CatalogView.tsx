@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import type { Product, Category } from "@/lib/shop";
-import { brandsOf } from "@/lib/shop";
+import { brandsOf, matchesSearch, normalizeSearch } from "@/lib/shop";
 import ProductCard from "./ProductCard";
 
 type Sort = "default" | "price-asc" | "price-desc" | "title-asc";
@@ -66,9 +66,16 @@ export default function CatalogView({
     setBrandFilter((prev) => prev.filter((b) => availableBrands.includes(b)));
   }, [availableBrands]);
 
+  // Нормализованный текст для поиска — считаем один раз на список товаров.
+  const searchIndex = useMemo(
+    () => new Map(products.map((p) => [p.id, normalizeSearch(`${p.title} ${p.brand}`)])),
+    [products]
+  );
+
   const filtered = useMemo(() => {
+    const q = normalizeSearch(query);
     let list = products.filter((p) => {
-      if (query && !p.title.toLowerCase().includes(query.toLowerCase())) return false;
+      if (q && !matchesSearch(searchIndex.get(p.id) ?? "", q)) return false;
       if (brandFilter.length && !brandFilter.includes(p.brand)) return false;
       if (sub && p.category !== sub) return false;
       if (inStockOnly && !p.inStock) return false;
@@ -80,7 +87,7 @@ export default function CatalogView({
     else if (sort === "title-asc")
       list = [...list].sort((a, b) => a.title.localeCompare(b.title, "ru"));
     return list;
-  }, [products, query, brandFilter, sub, inStockOnly, maxPrice, sort]);
+  }, [products, searchIndex, query, brandFilter, sub, inStockOnly, maxPrice, sort]);
 
   const shown = filtered.slice(0, limit);
 

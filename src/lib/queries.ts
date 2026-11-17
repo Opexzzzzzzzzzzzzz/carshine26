@@ -1,6 +1,13 @@
 import "server-only";
 import { prisma } from "@/lib/db";
-import { categoryBySlug, computeDiscount, groupBySlug, type Product } from "@/lib/shop";
+import {
+  categoryBySlug,
+  computeDiscount,
+  groupBySlug,
+  matchesSearch,
+  normalizeSearch,
+  type Product,
+} from "@/lib/shop";
 
 const lightSelect = {
   id: true,
@@ -131,13 +138,11 @@ export async function productsByGroupLite(groupSlug: string): Promise<Product[]>
 }
 
 export async function searchProductsLite(q: string, limit = 120): Promise<Product[]> {
-  const s = q.trim().toLowerCase();
+  const s = normalizeSearch(q);
   if (!s) return [];
   const rows = await prisma.product.findMany({ select: lightSelect });
   return rows
-    .filter(
-      (r) => r.title.toLowerCase().includes(s) || r.brand.toLowerCase().includes(s)
-    )
+    .filter((r) => matchesSearch(normalizeSearch(`${r.title} ${r.brand}`), s))
     .slice(0, limit)
     .map(liteToProduct);
 }
