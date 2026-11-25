@@ -9,6 +9,7 @@ type OrderPayload = {
   promo?: string;
   total?: number;
   items?: Item[];
+  consent?: boolean;
 };
 
 // Заявка с сайта сохраняется только в нашей БД (сервер в РФ) и видна в админке.
@@ -24,6 +25,10 @@ export async function POST(req: Request) {
   const items = data.items ?? [];
   if (!data.phone || items.length === 0) {
     return NextResponse.json({ ok: false, error: "empty" }, { status: 400 });
+  }
+  // Без согласия на обработку персональных данных заказ не принимаем (152-ФЗ, ст. 9).
+  if (data.consent !== true) {
+    return NextResponse.json({ ok: false, error: "no consent" }, { status: 400 });
   }
 
   const order = await prisma.order.create({

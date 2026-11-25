@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { groups } from "@/lib/shop";
+import { SELLER } from "@/lib/legal";
 
 export default function Footer() {
   return (
@@ -55,7 +56,8 @@ export default function Footer() {
             <li><Link href="/catalog" className="hover:text-gold">Все товары</Link></li>
             <li><Link href="/about" className="hover:text-gold">О нас</Link></li>
             <li><Link href="/contacts" className="hover:text-gold">Контакты</Link></li>
-            <li><Link href="/privacy" className="hover:text-gold">Политика конфиденциальности</Link></li>
+            <li><Link href="/privacy" className="hover:text-gold">Политика обработки персональных данных</Link></li>
+            <li><Link href="/consent" className="hover:text-gold">Согласие на обработку данных</Link></li>
           </ul>
         </div>
 
@@ -87,6 +89,9 @@ export default function Footer() {
             Вся информация на сайте, включая цены и наличие товаров, носит
             справочный характер и не является публичной офертой, определяемой
             положениями статьи 437 Гражданского кодекса РФ.
+          </p>
+          <p className="mb-2 leading-relaxed">
+            Продавец: {SELLER.name} · ИНН {SELLER.inn} · ОГРНИП {SELLER.ogrnip}
           </p>
           <div className="flex flex-col items-center justify-between gap-2 sm:flex-row">
             <span>© {new Date().getFullYear()} CarShine · Детейлинг-маркет</span>

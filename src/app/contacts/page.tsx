@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { SELLER } from "@/lib/legal";
 
 export const metadata: Metadata = {
   title: "Контакты",
@@ -31,6 +32,14 @@ export default function ContactsPage() {
             <a href="https://vk.com/carshinestavropol" className="text-fg-muted hover:text-gold">VK</a>
           </div>
         </Card>
+        <div className="sm:col-span-2">
+          <Card title="Реквизиты">
+            <div className="space-y-1 text-sm">
+              <div>{SELLER.name}</div>
+              <div className="text-fg-muted">ИНН {SELLER.inn} · ОГРНИП {SELLER.ogrnip} от {SELLER.ogrnipDate}</div>
+            </div>
+          </Card>
+        </div>
       </div>
 
       <a

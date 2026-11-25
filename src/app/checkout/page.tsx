@@ -16,7 +16,7 @@ export default function CheckoutPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!agree) { setError("Подтвердите согласие с политикой конфиденциальности"); return; }
+    if (!agree) { setError("Отметьте согласие на обработку персональных данных"); return; }
     setSending(true);
     try {
       const items = lines.map((l) => ({
@@ -28,7 +28,7 @@ export default function CheckoutPage() {
       const res = await fetch("/api/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, total, items }),
+        body: JSON.stringify({ ...form, total, items, consent: agree }),
       });
       if (!res.ok) throw new Error("bad response");
       clear();
@@ -83,10 +83,14 @@ export default function CheckoutPage() {
           <label className="mt-5 flex cursor-pointer items-start gap-2.5 text-sm text-fg-muted">
             <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[var(--gold)]" />
             <span>
-              Я согласен с{" "}
-              <Link href="/privacy" className="text-gold hover:underline">политикой конфиденциальности</Link>
+              Даю{" "}
+              <Link href="/consent" target="_blank" className="text-gold hover:underline">согласие на обработку персональных данных</Link>
             </span>
           </label>
+          <p className="mt-2 pl-6 text-xs text-fg-dim">
+            Как мы обрабатываем данные — в{" "}
+            <Link href="/privacy" target="_blank" className="hover:text-gold hover:underline">Политике обработки персональных данных</Link>.
+          </p>
 
           {error && <div className="mt-4 rounded-lg bg-danger/10 px-4 py-3 text-sm text-danger">{error}</div>}
         </div>
