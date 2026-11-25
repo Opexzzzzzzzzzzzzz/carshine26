@@ -39,8 +39,6 @@ if [ ! -f .env ]; then
   cat > .env <<EOF
 DATABASE_URL="file:./dev.db"
 ADMIN_PASSWORD="$ADMIN_PW"
-TELEGRAM_BOT_TOKEN=""
-TELEGRAM_CHAT_ID=""
 EOF
   echo "    Сгенерирован пароль админки (сохрани!): $ADMIN_PW"
 else

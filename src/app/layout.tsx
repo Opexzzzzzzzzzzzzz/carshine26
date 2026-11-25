@@ -49,8 +49,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="ru" className={`${body.variable} ${display.variable} h-full`}>
       <head>
         <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+          rel="preload"
+          href="/fonts/material-symbols-outlined.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
         />
       </head>
       <body className="min-h-full flex flex-col">
