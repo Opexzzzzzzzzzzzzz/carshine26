@@ -56,3 +56,6 @@ adminshots.mjs
 
 # загруженные через админку фото (runtime)
 /public/uploads/
+
+# бэкап ссылок при переносе фото (данные конкретного сервера)
+prisma/photo-migration-backup.json
